@@ -54,13 +54,19 @@ SB check --impeccable    # built-in design checks plus the Impeccable detector, 
 - For each section that really needs it, start a fix sub-agent with this instruction (again all in one message): "Run `SB task <id> --fix "<what to change>"`, follow it, then `SB submit <id> <file>`."
 - At most 3 fixes. Then run `SB done`.
 
-## 5. Comments from the user
+## 5. Live comments from the user
 
-The user can click any element in the preview and leave a comment.
+The user can click any element in the preview and leave a comment. Keep listening so they never have to copy anything to you:
 
-- When they ask you to apply comments, run `SB comments`.
-- For each section that has comments, start a sub-agent (all in one message) with this instruction: "Run `SB task <id> --comments`, follow it, then `SB submit <id> <file>`."
-- Submitting resolves that section's open comments.
+```bash
+SB watch          # waits up to 4 minutes for new comments, then prints them
+```
+
+- When `watch` returns comments, start one sub-agent per commented section, all in one message. Each one gets this instruction: "Run `SB task <id> --comments`, follow it, then `SB submit <id> <file>`." The preview rebuilds those sections live.
+- Then run `SB watch` again.
+- Stop when `watch` returns nothing twice in a row, or when the user says they're finished.
+- Tell the user they can keep commenting while you listen.
+- Submitting resolves that section's comments. `SB restore <id>` brings back the previous version if the user wants it.
 
 ## 6. Put the page into the project
 

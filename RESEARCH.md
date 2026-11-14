@@ -80,3 +80,22 @@
 - **Now**: swarm-build never calls a model. Planning, building, reviewing and comment edits are all done by the user's own agent and sub-agents, through the CLI or MCP.
 - **Comments**: the preview's comment button copies a request for the agent ("Apply the swarm-build comments…"). The preview can't start an agent by itself, so the user pastes that request into the chat.
 - **Videos**: `tools/record.mjs` records the replay of a finished run instead of driving a build.
+
+## v0.5: live building
+
+- **Bug: replays on reload.** Opening or reloading the preview replayed the whole build from the event log, and the timer kept counting.
+  - The server now sends a `sync` marker after the backlog.
+  - Everything before it is applied instantly with no animation; only new events animate.
+  - The timer freezes at the build's `done` event, and later comment rebuilds don't restart it.
+- **Scope.** Planning and design decisions are left to the user's agent and its design skills. swarm-build focuses on parallel building and the live preview.
+- **Choreography** (clean-room, after the behaviour described in the swarm-cursors README and Joel Califa's Swarm):
+  - A tool cursor for each action: arrow, crosshair, I-beam, pen and ⌥-copy.
+  - Text boxes with a caret, and headings that step up to size while typing.
+  - Pen-tool lines, ruler guides with snapping, and ⌥-drag duplicates with spacing.
+  - Flocking around the mouse at the end, and Web Audio sound.
+- **Bug: double submits.** Sub-agents sometimes run `submit` while the file write is still in flight.
+  - `submit` now waits until the file exists, ends in a closing tag and stops changing.
+  - A newer submit of the same section cancels the older animation.
+- **Live comments.** `watch` blocks while writing a heartbeat file and claims new comments, so a second watch never returns the same comment twice. The preview polls the heartbeat to show "your agent is listening".
+- **Versions.** Every submit is kept in `sections/history/`. Undo and restore need no agent.
+- **Performance.** The frame loop only writes to the DOM when a value changes.

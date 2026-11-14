@@ -31,7 +31,7 @@ Then tell your agent: **"swarm build a landing page for a yoga studio in Goa"**.
 2. Plan the design direction, theme, type scale and sections.
 3. Start one sub-agent per section, all in parallel.
 4. Run design checks and fix weak sections.
-5. Ask you to comment. Click anything in the preview and write the change. Then click **Copy request for your agent** and paste it into the chat. Only those sections are rebuilt, live.
+5. Listen for your comments with `swarm-build watch`. Click anything in the preview and write the change; only that section is rebuilt, live.
 6. Export the page into your project's framework.
 
 What `init` writes:
@@ -46,14 +46,33 @@ What `init` writes:
 
 Add `--agent claude,codex` to choose agents and `--global` to install for your user instead of the project. `.swarm/` is added to `.gitignore`.
 
-## The preview
+## The live preview
 
-- The **Planner** cursor picks a direction. Then each agent gets a dashed slot and a live character count.
-- When a section lands, its agent drags out the boxes (with size badges), types the text and draws the SVGs.
-- The **Reviewer** scans the page. Sections it flags are rebuilt by their own agent.
-- **Desktop / Mobile** toggle: the stage is an iframe, so Tailwind breakpoints are real.
-- **Comment** (or press `C`): click any element and write what should change. Pins stay on the element.
-- **Replay** at 1×, 2× or 3×. Long idle gaps are squeezed to 3 s. **Go live** hides the cursors.
+It shows the real build as it happens, and opening it later shows the result at once. A build is only replayed when you click **Replay**.
+
+**How the cursors build.** Each cursor is a real agent. While it writes, its cursor waits in its section's slot with a live character count. When the section lands, the cursor assembles the real markup:
+- **Boxes:** a crosshair drags each box out with a live W × H badge.
+- **Text:** an I-beam drags a text box, then types with a blinking caret. Big headings start small and step up to size.
+- **Lines:** dividers and single borders are drawn with a pen tool, point to point.
+- **Guides:** Figma-style rulers slide in, a red guide is dragged out, and text snaps onto it.
+- **Duplicates:** repeated cards, links and rows are built once, then ⌥-dragged into place with red spacing measurements and retyped.
+- **Planner and finale:** the Planner circles while planning, then the agents fan out to their sections. At the end the cursors gather around your mouse until you click **Go live**.
+- **Sound:** keyboard clicks and soft notes, generated in the browser with no files. **M** mutes it.
+
+**Controls:**
+
+| Control | What it does |
+|---|---|
+| 375 / 768 / 1280 / 1440, or drag the frame edge | Real breakpoints: the page renders in an iframe at that width |
+| Click an agent | The camera follows that agent |
+| Hover a section | **Code** (HTML and JSX, with copy), **History** (every version, view or restore), **Undo**, **Comment** |
+| **C** or Comment | Click any element and write what should change |
+| Tour | Auto-scrolls through the page |
+| **H** | Hides the bars for clean screen recordings |
+| 1× / 2× / 3× | Animation speed |
+| Replay | Plays the build again, with long idle gaps cut to 3 s |
+
+**Live comments.** After the build, your agent runs `swarm-build watch`, and the preview shows "your agent is listening". Each comment you leave goes straight to the agent. One sub-agent per commented section rebuilds it, and you watch it change. There's nothing to copy or paste.
 
 ## Commands
 
@@ -67,9 +86,11 @@ swarm-build task <id> [--fix "..."] [--comments]
 swarm-build submit <id> .swarm/out/<id>.html
 swarm-build check --impeccable
 swarm-build comments | status | done
+swarm-build watch                      # wait for the user's next comments in the preview
+swarm-build restore <id> [version]     # put an earlier version back, no agent work
 ```
 
-MCP tools (`swarm-build mcp`): `swarm_start`, `swarm_plan`, `swarm_task`, `swarm_submit`, `swarm_check`, `swarm_comments`, `swarm_status`, `swarm_done`, `swarm_export`.
+MCP tools (`swarm-build mcp`): `swarm_start`, `swarm_plan`, `swarm_task`, `swarm_submit`, `swarm_check`, `swarm_comments`, `swarm_status`, `swarm_done`, `swarm_export`, `swarm_watch`.
 
 ## Framework output
 

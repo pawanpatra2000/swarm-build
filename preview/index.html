@@ -15,39 +15,46 @@
   <div class="chips">
     <span id="model" class="chip"></span>
     <span id="phase" class="chip phase">connecting</span>
-    <span id="timer" class="chip mono">0.0s</span>
-    <div class="seg" role="group" aria-label="Device">
-      <button type="button" data-device="desktop" aria-pressed="true" title="Desktop (1280px)">Desktop</button>
-      <button type="button" data-device="mobile" aria-pressed="false" title="Mobile (390px)">Mobile</button>
+    <span id="timer" class="chip mono" title="Build time">0.0s</span>
+    <div class="seg" role="group" aria-label="Width">
+      <button type="button" data-width="375" title="Phone (375px)">375</button>
+      <button type="button" data-width="768" title="Tablet (768px)">768</button>
+      <button type="button" data-width="1280" title="Laptop (1280px)">1280</button>
+      <button type="button" data-width="1440" title="Desktop (1440px)">1440</button>
     </div>
     <div class="seg" role="group" aria-label="Animation speed">
       <button type="button" data-speed="1">1×</button>
       <button type="button" data-speed="2">2×</button>
       <button type="button" data-speed="3">3×</button>
     </div>
+    <button type="button" id="sound" class="ghost icon" title="Sound (M)" aria-pressed="true">🔊</button>
+    <button type="button" id="tour" class="ghost" title="Auto-scroll through the page">Tour</button>
     <button type="button" id="comment-toggle" class="ghost" aria-pressed="false" title="Click any element to leave a comment (C)">Comment</button>
-    <button type="button" id="replay-top" class="ghost">Replay</button>
+    <button type="button" id="replay-top" class="ghost" title="Play the build again">Replay</button>
+    <button type="button" id="hide" class="ghost icon" title="Hide the toolbars for recording (H)">⤢</button>
   </div>
 </header>
 
 <main id="main">
   <section id="canvas" aria-label="Live build preview">
     <div id="frame">
-      <div class="frame-bar"><i></i><i></i><i></i><span id="frame-url">preview</span><a id="open-page-bar" href="page" target="_blank" rel="noopener">open page ↗</a></div>
+      <div class="frame-bar"><i></i><i></i><i></i><span id="frame-url">preview</span><span id="frame-width" class="mono"></span><a id="open-page-bar" href="page" target="_blank" rel="noopener">open page ↗</a></div>
       <div id="frame-body"><iframe id="stage" title="Page being built" scrolling="no"></iframe></div>
+      <div id="resize" title="Drag to set any width" aria-hidden="true"></div>
     </div>
   </section>
   <aside id="panel">
-    <h2>Agents</h2>
+    <h2>Agents <span id="follow-hint" class="hint">click one to follow it</span></h2>
     <ul id="agents"></ul>
     <div id="review-box" hidden>
-      <h2>Design review</h2>
+      <h2>Checks</h2>
       <div id="review"></div>
     </div>
     <div id="comments-box">
       <h2>Comments <span id="comment-count"></span></h2>
       <p class="hint" id="comment-hint">Press <kbd>C</kbd> or click Comment, then click any part of the page.</p>
       <ol id="comments"></ol>
+      <p class="hint watching" id="watching" hidden>● Your agent is listening. New comments are applied automatically.</p>
       <button type="button" id="apply" class="primary small" hidden>Copy request for your agent</button>
       <p class="hint" id="apply-msg" hidden></p>
     </div>
@@ -57,6 +64,14 @@
 </main>
 
 <div id="overlay" aria-hidden="true"></div>
+
+<div id="section-bar" hidden>
+  <span id="sb-name"></span>
+  <button type="button" data-act="code">Code</button>
+  <button type="button" data-act="history">History</button>
+  <button type="button" data-act="undo" title="Restore the previous version">Undo</button>
+  <button type="button" data-act="comment">Comment</button>
+</div>
 
 <form id="popover" hidden>
   <div class="pop-target" id="pop-target"></div>
@@ -68,6 +83,18 @@
   </div>
 </form>
 
+<div id="modal" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h3 id="modal-title"></h3>
+      <div class="seg" id="modal-tabs"></div>
+      <button type="button" id="modal-copy" class="ghost small">Copy</button>
+      <button type="button" id="modal-close" class="ghost small" aria-label="Close">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
 <div id="finale" hidden>
   <div class="card">
     <div class="kicker">Build complete</div>
@@ -77,7 +104,7 @@
       <div><dt>Agents in parallel</dt><dd id="f-agents"></dd></div>
       <div><dt>One agent, one after another</dt><dd id="f-seq"></dd></div>
       <div><dt>Speed-up</dt><dd id="f-speed"></dd></div>
-      <div><dt>Model cost</dt><dd id="f-cost"></dd></div>
+      <div><dt>Sections</dt><dd id="f-sections"></dd></div>
     </dl>
     <div class="actions">
       <button type="button" id="go-live" class="primary">Go live</button>

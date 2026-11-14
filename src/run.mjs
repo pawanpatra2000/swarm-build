@@ -2,7 +2,8 @@
 //   run.json        meta: brief, createdAt, mode
 //   events.jsonl    append-only event log; the preview streams it, replay reads it
 //   plan.json       planner output after normalising
-//   sections/*.html one file per section (latest version)
+//   sections/*.html one file per section (latest version); sections/history/<id>.<n>.html every version
+//   watching.json   heartbeat while the agent runs `swarm-build watch`
 //   comments.json   comments left in the preview
 //   index.html      assembled page
 import { mkdir, readFile, writeFile, appendFile, readdir, stat } from 'node:fs/promises';
@@ -19,6 +20,10 @@ export const AGENTS = [
   { name: 'Dennis', color: '#c2185b' },
   { name: 'Barbara', color: '#5c6bc0' },
   { name: 'Ken', color: '#6d9f3a' },
+  { name: 'Hedy', color: '#ef6c00' },
+  { name: 'Tim', color: '#00897b' },
+  { name: 'Radia', color: '#8e24aa' },
+  { name: 'Guido', color: '#3949ab' },
 ];
 export const MAX_SECTIONS = AGENTS.length;
 
@@ -130,6 +135,7 @@ export class Run {
     const clean = sanitize(html, id);
     await writeFile(this.file('sections', `${id}.html`), clean);
     const lastStart = await this.lastStart(id);
+    await this.saveVersion(id, clean, reason || lastStart?.reason || 'build');
     const why = reason || lastStart?.reason || 'build';
     const startT = started ?? (lastStart ? this.meta.createdAt + lastStart.t : Date.now());
     const ms = Date.now() - startT;
@@ -139,6 +145,61 @@ export class Run {
     await this.emit({ type: 'agent:done', id, agent: section.agent, html: clean, ms, cost, reason: why, resolves: resolved, chars: chars ?? html.length });
     await this.writePage();
     return { id, html: clean, ms, reason: why, resolved };
+  }
+
+  // ---------- versions ----------
+  async versions(id) {
+    const dir = this.file('sections', 'history');
+    const files = (await readdir(dir).catch(() => [])).filter((f) => f.startsWith(`${id}.`) && f.endsWith('.html'));
+    const meta = JSON.parse(await readFile(path.join(dir, 'index.json'), 'utf8').catch(() => '{}'));
+    return files
+      .map((f) => Number(f.slice(id.length + 1, -5)))
+      .filter((n) => Number.isInteger(n))
+      .sort((a, b) => a - b)
+      .map((n) => ({ n, ...(meta[`${id}.${n}`] || {}) }));
+  }
+
+  async saveVersion(id, html, reason) {
+    const dir = this.file('sections', 'history');
+    await mkdir(dir, { recursive: true });
+    const n = ((await this.versions(id)).at(-1)?.n || 0) + 1;
+    await writeFile(path.join(dir, `${id}.${n}.html`), html);
+    const idx = path.join(dir, 'index.json');
+    const meta = JSON.parse(await readFile(idx, 'utf8').catch(() => '{}'));
+    meta[`${id}.${n}`] = { at: Date.now(), reason };
+    await writeFile(idx, JSON.stringify(meta, null, 2));
+    return n;
+  }
+
+  // Puts an earlier version back without any agent work. Announced like a normal submit so the preview updates.
+  async restoreSection(id, n) {
+    const plan = await this.plan();
+    const section = plan.sections.find((s) => s.id === id);
+    if (!section) throw new Error('Unknown section.');
+    const list = await this.versions(id);
+    const target = n == null ? list.at(-2) : list.find((v) => v.n === Number(n));
+    if (!target) throw new Error('No earlier version to restore.');
+    const html = await readFile(this.file('sections', 'history', `${id}.${target.n}.html`), 'utf8');
+    await writeFile(this.file('sections', `${id}.html`), html);
+    await this.saveVersion(id, html, `restore v${target.n}`);
+    await this.emit({ type: 'agent:done', id, agent: section.agent, html, ms: 0, reason: 'restore', restored: target.n, chars: html.length });
+    await this.writePage();
+    return target.n;
+  }
+
+  // ---------- watch heartbeat ----------
+  async heartbeat() { await writeFile(this.file('watching.json'), JSON.stringify({ at: Date.now() })); }
+  async watching() {
+    try { return Date.now() - JSON.parse(await readFile(this.file('watching.json'), 'utf8')).at < 15000; } catch { return false; }
+  }
+
+  async claimComments() {
+    const list = await this.comments();
+    const fresh = list.filter((c) => c.status === 'open' && !c.claimedAt);
+    if (!fresh.length) return [];
+    for (const c of fresh) c.claimedAt = Date.now();
+    await writeFile(this.file('comments.json'), JSON.stringify(list, null, 2));
+    return fresh;
   }
 
   async startAgent(id, { reason = 'build', note } = {}) {
@@ -163,7 +224,7 @@ export class Run {
 
   async missingSections() {
     const plan = await this.plan();
-    const have = new Set((await readdir(this.file('sections')).catch(() => [])).map((f) => f.replace(/\.html$/, '')));
+    const have = new Set((await readdir(this.file('sections')).catch(() => [])).filter((f) => f.endsWith('.html')).map((f) => f.replace(/\.html$/, '')));
     return plan.sections.filter((s) => !have.has(s.id)).map((s) => s.id);
   }
 

@@ -34,6 +34,8 @@ Your coding agent plans and builds with its own model. No API key, no extra cost
   swarm-build submit <id> <file|->  save a section
   swarm-build check [--impeccable]  design checks on the current page
   swarm-build comments              open comments from the preview, as JSON
+  swarm-build watch [--timeout 240] wait for the user's next comments in the preview, then print them
+  swarm-build restore <id> [n]      put an earlier version of a section back (no agent work)
   swarm-build status | done
 
 Preview, replay, export, setup:
@@ -69,7 +71,18 @@ async function readInput(file) {
     for await (const c of process.stdin) chunks.push(c);
     return Buffer.concat(chunks).toString('utf8');
   }
-  return readFile(path.resolve(file), 'utf8');
+  // Agents often run submit in the same step as the file write. Wait (up to 5 s) until the file exists,
+  // has markup and stops changing, so a half-written file is never submitted.
+  const p = path.resolve(file);
+  let last = null;
+  for (let i = 0; i < 25; i++) {
+    const text = existsSync(p) ? await readFile(p, 'utf8') : null;
+    if (text && /<\/(section|footer|header|div|main)>\s*$/i.test(text.trim()) && text === last) return text;
+    last = text;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  if (last == null) throw new Error(`File not found: ${file}`);
+  return last;
 }
 
 const openURL = (u) => exec(process.platform === 'darwin' ? `open "${u}"` : process.platform === 'win32' ? `start "" "${u}"` : `xdg-open "${u}"`);
@@ -197,6 +210,33 @@ export async function agentStatus(run) {
   };
 }
 
+// Blocks until the user leaves new comments in the preview (or the timeout passes), then returns them.
+// While it runs, the preview shows "your agent is listening".
+export async function agentWatch(run, { timeoutMs = 240000 } = {}) {
+  const until = Date.now() + timeoutMs;
+  await run.emit({ type: 'watch', on: true });
+  try {
+    while (Date.now() < until) {
+      await run.heartbeat();
+      const fresh = await run.claimComments();
+      if (fresh.length) return fresh;
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    return [];
+  } finally {
+    await run.emit({ type: 'watch', on: false });
+  }
+}
+
+export function watchReport(list, how = 'cli') {
+  if (!list.length) return 'No new comments. Run watch again to keep listening, or stop if the user is finished.';
+  const ids = [...new Set(list.map((c) => c.section))];
+  const step = how === 'mcp'
+    ? 'calls swarm_task {id, comments: true}, follows it, then swarm_submit'
+    : `runs \`${sbCmd()} task <id> --comments\`, follows it, then \`${sbCmd()} submit <id> <file>\``;
+  return `${list.length} new comment(s) on: ${ids.join(', ')}\n${JSON.stringify(list.map(({ id, section, target, text }) => ({ id, section, target, text })), null, 2)}\n\nStart one sub-agent per section above, all in one message. Each ${step}. Then watch again.`;
+}
+
 export async function agentDone(run) {
   const stats = await run.stats({ model: null });
   await run.emit({ type: 'done', stats });
@@ -280,6 +320,17 @@ export async function main(argv) {
       const run = await current();
       const list = (await run.comments()).filter((c) => o.all || c.status === 'open');
       return console.log(JSON.stringify(list, null, 2));
+    }
+    case 'watch': {
+      const run = await current();
+      const list = await agentWatch(run, { timeoutMs: Number(o.timeout || 240) * 1000 });
+      return console.log(watchReport(list));
+    }
+    case 'restore': {
+      const run = await current();
+      const [, id, n] = o._;
+      if (!id) throw new Error('Use: swarm-build restore <section-id> [version]');
+      return console.log(`Restored ${id} to version ${await run.restoreSection(id, n)}.`);
     }
     case 'status': return console.log(JSON.stringify(await agentStatus(await current()), null, 2));
     case 'done': {

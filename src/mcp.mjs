@@ -39,6 +39,11 @@ const TOOLS = [
     description: 'Put the finished page into the project as framework components. target "auto" detects Next, React, Vue, Nuxt, Svelte, SvelteKit, Astro or plain HTML from package.json. Never overwrites files unless force is true.',
     inputSchema: { type: 'object', properties: { target: { type: 'string', enum: ['auto', 'next', 'react', 'vue', 'nuxt', 'svelte', 'sveltekit', 'astro', 'html'] }, into: { type: 'string', description: 'Project folder; default is the current folder.' }, route: { type: 'string' }, force: { type: 'boolean' } } },
   },
+  {
+    name: 'swarm_watch',
+    description: 'Wait (up to ~100 s) for the user to leave new comments in the live preview, then return them. Call it in a loop after the build while the user reviews; apply what it returns with parallel sub-agents.',
+    inputSchema: { type: 'object', properties: { seconds: { type: 'number', description: 'How long to wait, 10-110. Default 100.' } } },
+  },
   { name: 'swarm_comments', description: 'List open comments the user left in the preview, grouped by section.', inputSchema: { type: 'object', properties: {} } },
   { name: 'swarm_status', description: 'Show the run: page path, sections, which are missing, open comments.', inputSchema: { type: 'object', properties: {} } },
   { name: 'swarm_done', description: 'Mark the build finished. Shows the result card in the preview and returns timing.', inputSchema: { type: 'object', properties: {} } },
@@ -76,6 +81,11 @@ async function call(name, a = {}) {
       const { exportFramework } = await import('./frameworks.mjs');
       const r = await exportFramework(await current(), { target: a.target || 'auto', into: a.into || process.cwd(), route: a.route, force: a.force });
       return `${r.target} export into ${r.dir}\n${r.files.map((f) => `- ${f}`).join('\n')}${r.route ? `\nroute: ${r.route}` : ''}${r.notes.length ? `\n${r.notes.map((n) => `note: ${n}`).join('\n')}` : ''}\nRun the project's build or type-check once and fix anything it reports.`;
+    }
+    case 'swarm_watch': {
+      const { agentWatch, watchReport } = await import('./cli.mjs');
+      const secs = Math.min(110, Math.max(10, Number(a.seconds) || 100));
+      return watchReport(await agentWatch(await current(), { timeoutMs: secs * 1000 }), 'mcp');
     }
     case 'swarm_status': return JSON.stringify(await agentStatus(await current()), null, 2);
     case 'swarm_done': {

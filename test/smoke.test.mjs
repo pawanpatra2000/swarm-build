@@ -70,6 +70,34 @@ test('framework exports write the right files', () => {
   assert.ok(existsSync(svelteDir));
 });
 
+test('watch returns new comments and restore brings back a version', async () => {
+  const { spawn } = await import('node:child_process');
+  const child = spawn(process.execPath, [BIN, 'watch', '--timeout', '20'], { cwd: dir });
+  let out = '';
+  child.stdout.on('data', (d) => (out += d));
+  await new Promise((r) => setTimeout(r, 1500));
+  const status = JSON.parse(sb('status'));
+  const run = path.dirname(status.page);
+  assert.ok(existsSync(path.join(run, 'watching.json')), 'heartbeat written while watching');
+  const { Run } = await import('../src/run.mjs');
+  const r = await Run.open(run);
+  await r.addComment({ section: 'hero', text: 'Make the headline shorter' });
+  const code = await new Promise((res) => child.on('exit', res));
+  assert.equal(code, 0);
+  assert.match(out, /1 new comment\(s\) on: hero/);
+  assert.match(out, /Make the headline shorter/);
+  // a second watch does not return the same comment again
+  const again = execFileSync(process.execPath, [BIN, 'watch', '--timeout', '2'], { cwd: dir, encoding: 'utf8' });
+  assert.match(again, /No new comments/);
+  // versions + restore
+  sb('task', 'hero', '--comments');
+  writeFileSync(path.join(dir, '.swarm', 'out', 'hero2.html'), '<section><div class="sb-wrap"><h1 class="sb-h1">Chai.</h1></div></section>');
+  assert.match(sb('submit', 'hero', '.swarm/out/hero2.html'), /resolved c1/);
+  assert.equal((await r.versions('hero')).length, 2);
+  assert.match(sb('restore', 'hero'), /version 1/);
+  assert.match(readFileSync(path.join(run, 'sections', 'hero.html'), 'utf8'), /Chai /);
+});
+
 test('there is no API-key mode', () => {
   const r = spawnSync(process.execPath, [BIN, 'run', 'a page'], { cwd: dir, encoding: 'utf8' });
   assert.notEqual(r.status, 0);
