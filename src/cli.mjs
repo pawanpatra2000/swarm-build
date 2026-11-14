@@ -1,5 +1,5 @@
-// swarm-build command line. Standalone mode calls a model itself; agent mode lets a coding agent
-// (Claude Code, Codex, Cursor, Kiro, ...) do the planning and building through these commands.
+// swarm-build command line. A coding agent (Claude Code, Codex, Cursor, Kiro, ...) does all the planning and
+// building with its own model through these commands. swarm-build itself never calls a model or needs an API key.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { spawn, exec } from 'node:child_process';
@@ -25,11 +25,7 @@ const rel = (p) => path.relative(process.cwd(), p) || '.';
 
 const HELP = `swarm-build ${VERSION}: plan a UI into sections, build them in parallel, watch the swarm live.
 
-Standalone (this tool calls the model; needs ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY or gcloud + GCP_PROJECT):
-  swarm-build run "<brief>" [--brief-file f] [--sections 6] [--theme theme.json] [--design-file DESIGN.md]
-                  [--no-review] [--impeccable] [--open] [--now] [--headless] [--port 4777]
-
-Agent mode (any coding agent plans and builds with its own model; no API key):
+Your coding agent plans and builds with its own model. No API key, no extra cost:
   swarm-build guide                 print the full workflow for the agent to follow (no install needed)
   swarm-build start "<brief>" | --brief-file f [--agent "Claude Code"] [--no-preview] [--open]
   swarm-build guide plan            print planning instructions and the plan JSON shape
@@ -52,7 +48,7 @@ Common: --run <dir> picks a run (default: .swarm/current). --root <dir> changes 
 
 export function parseArgs(argv) {
   const o = { _: [] };
-  const flags = new Set(['open', 'now', 'headless', 'no-review', 'impeccable', 'no-preview', 'comments', 'design', 'global', 'json', 'help', 'version', 'yes', 'all', 'mcp', 'force']);
+  const flags = new Set(['open', 'impeccable', 'no-preview', 'comments', 'design', 'global', 'json', 'help', 'version', 'yes', 'all', 'mcp', 'force']);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '-h') o.help = true;
@@ -222,33 +218,6 @@ function logEvent(e) {
   }
 }
 
-async function cmdRun(o) {
-  const { runSwarm, applyComments, loadDesignDoc } = await import('./pipeline.mjs');
-  const brief = (o['brief-file'] ? await readFile(o['brief-file'], 'utf8') : o._.slice(1).join(' ')).trim();
-  if (!brief) throw new Error('Give a brief: swarm-build run "<brief>" or --brief-file f');
-  const root = o.root || '.swarm';
-  const theme = o.theme ? JSON.parse(await readFile(o.theme, 'utf8')) : undefined;
-  const run = await Run.create(brief, { root, mode: 'standalone' });
-  const opts = { run, maxSections: Number(o.sections || 6), theme, review: !o['no-review'], impeccable: Boolean(o.impeccable), designFile: o['design-file'] };
-  // print events as they land
-  let seen = 0;
-  const tail = setInterval(async () => { const evs = await run.events(); evs.slice(seen).forEach(logEvent); seen = evs.length; }, 200);
-  if (o.headless) {
-    await runSwarm(brief, opts);
-    await new Promise((r) => setTimeout(r, 300));
-    clearInterval(tail);
-    return;
-  }
-  const designDoc = (await loadDesignDoc(o['design-file']))?.text;
-  let go;
-  const first = new Promise((r) => (go = r));
-  const pv = await startPreview({ runDir: run.dir, port: Number(o.port || 4777), onFirstClient: () => go(), onApply: (r) => applyComments(r, { designDoc }) });
-  console.log(`swarm-build preview: ${pv.url}${o.now ? '' : '  (the build starts when the page opens)'}`);
-  if (o.open) openURL(pv.url);
-  await runSwarm(brief, { ...opts, waitFor: o.now ? null : first });
-  console.log('Preview stays open for comments. Ctrl+C to stop.');
-}
-
 export async function main(argv) {
   const o = parseArgs(argv);
   const cmd = o._[0];
@@ -258,7 +227,7 @@ export async function main(argv) {
   const current = () => Run.resolve(o.run);
 
   switch (cmd) {
-    case 'run': return cmdRun(o);
+    case 'run': throw new Error('There is no API-key mode. Ask your coding agent: run `npx -y swarm-build guide` and follow it.');
     case 'start': {
       const brief = o['brief-file'] ? await readFile(o['brief-file'], 'utf8') : o._.slice(1).join(' ');
       const { run, url } = await agentStart({ brief, root, agent: o.agent, preview: !o['no-preview'], port: o.port });

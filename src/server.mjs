@@ -1,5 +1,5 @@
-// Preview server. It follows a run folder on disk, so it works the same whether this process,
-// a coding agent's CLI calls or the MCP server write the sections.
+// Preview server. It follows a run folder on disk, so it shows whatever the coding agent writes,
+// through CLI calls or the MCP server.
 import http from 'node:http';
 import { readFile, stat, open } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
@@ -12,11 +12,10 @@ const PREVIEW = path.join(PKG, 'preview');
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
 // root: the .swarm folder (follows root/current). runDir: pin one run instead.
-export function startPreview({ root = '.swarm', runDir, port = 4777, host = '127.0.0.1', onApply, onFirstClient, label } = {}) {
+export function startPreview({ root = '.swarm', runDir, port = 4777, host = '127.0.0.1', label } = {}) {
   root = path.resolve(root);
   const clients = new Set();
   const feed = { dir: null, offset: 0, partial: '', seq: 0, lines: [] };
-  let firstClient = false;
 
   const currentDir = () => {
     if (runDir) return path.resolve(runDir);
@@ -107,7 +106,6 @@ export function startPreview({ root = '.swarm', runDir, port = 4777, host = '127
         clients.add(res);
         const ping = setInterval(() => res.write(': ping\n\n'), 15000);
         req.on('close', () => { clients.delete(res); clearInterval(ping); });
-        if (!firstClient) { firstClient = true; onFirstClient?.(); }
         return;
       }
       if (url.pathname === '/api/health') return json(res, 200, { ok: true, app: 'swarm-build', root, run: currentDir() });
@@ -116,7 +114,7 @@ export function startPreview({ root = '.swarm', runDir, port = 4777, host = '127
         if (!dir) return json(res, 200, { run: null });
         const run = await Run.open(dir);
         return json(res, 200, {
-          run: dir, mode: run.meta.mode, canApply: Boolean(onApply),
+          run: dir, mode: run.meta.mode,
           plan: run.hasPlan() ? await run.plan() : null, comments: await run.comments(),
         });
       }
@@ -126,13 +124,6 @@ export function startPreview({ root = '.swarm', runDir, port = 4777, host = '127
         const body = await readBody(req);
         const c = await (await Run.open(dir)).addComment(body);
         return json(res, 200, { comment: c });
-      }
-      if (url.pathname === '/api/apply' && req.method === 'POST') {
-        const dir = currentDir();
-        if (!dir) return json(res, 400, { error: 'no run' });
-        if (!onApply) return json(res, 200, { started: false, message: 'Ask your coding agent to apply the swarm comments.' });
-        onApply(await Run.open(dir)).catch((err) => console.error('[apply]', err));
-        return json(res, 200, { started: true });
       }
       if (url.pathname === '/page' || url.pathname === '/page/') {
         const dir = currentDir();

@@ -1,4 +1,4 @@
-// A run is a folder. Every mode (standalone, CLI agent mode, MCP) reads and writes the same files:
+// A run is a folder. The CLI and the MCP server both read and write the same files:
 //   run.json        meta: brief, createdAt, mode
 //   events.jsonl    append-only event log; the preview streams it, replay reads it
 //   plan.json       planner output after normalising
@@ -30,7 +30,7 @@ export class Run {
     this.meta = meta;
   }
 
-  static async create(brief, { root = '.swarm', mode = 'standalone', name } = {}) {
+  static async create(brief, { root = '.swarm', mode = 'agent', name } = {}) {
     const stamp = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '');
     const dir = path.resolve(root, `${slugify(name || brief.split('\n')[0]).slice(0, 40)}-${stamp}`);
     await mkdir(path.join(dir, 'sections'), { recursive: true });

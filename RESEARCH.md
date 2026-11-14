@@ -46,7 +46,7 @@
 
 - Most people who would use this already have Claude Code, Codex, Cursor or Kiro, so asking them for a separate API key is friction.
 - Agent mode moves the thinking into their agent. The run lives in a folder (`events.jsonl`, `plan.json`, `sections/`).
-- The preview tails that folder. Any writer, whether the standalone engine, CLI calls or the MCP server, produces the same live animation.
+- The preview tails that folder. Whether the agent writes through CLI calls or the MCP server, the live animation is the same.
 - Parallelism comes from the agent's own sub-agents. The skill tells the agent to start them all in one message.
 
 ### Platforms
@@ -73,3 +73,10 @@
 - **False "truncated" review**: the review prompt clipped sections to 7,000 characters, so the reviewer reported the sections as cut off and rebuilt them for nothing. Long sections are now sent in full up to 16,000 characters, with an explicit note if clipped.
 - **Non-section roots**: a builder returned a `<footer>` root and the submit was rejected. Non-section roots are now wrapped instead of rejected.
 - **Idle gaps in replays**: replaying an agent-mode run took more than 6 minutes, because idle gaps (a person thinking) were kept. Replay now squeezes gaps to 3 s, and the share export of that run plays in about 35 s at 2×.
+
+## v0.4: agent-only
+
+- **Why**: the API-key mode was removed. People already pay for a coding agent, and a second model bill or key setup is friction. It also kept two code paths for one job.
+- **Now**: swarm-build never calls a model. Planning, building, reviewing and comment edits are all done by the user's own agent and sub-agents, through the CLI or MCP.
+- **Comments**: the preview's comment button copies a request for the agent ("Apply the swarm-build comments…"). The preview can't start an agent by itself, so the user pastes that request into the chat.
+- **Videos**: `tools/record.mjs` records the replay of a finished run instead of driving a build.

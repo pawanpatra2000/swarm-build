@@ -1,7 +1,7 @@
 {
   "name": "swarm-build",
-  "version": "0.3.1",
-  "description": "Any coding agent (Claude Code, Codex, Cursor, Kiro, ...) plans a UI into sections, builds them in parallel with its own sub-agents, and you watch swarm cursors assemble the real page live. Exports to Next.js, React, Vue, Nuxt, Svelte, SvelteKit and Astro. No API key needed.",
+  "version": "0.4.0",
+  "description": "Your coding agent (Claude Code, Codex, Cursor, Kiro, T3 Code, ...) plans a UI into sections and builds them in parallel with its own sub-agents while you watch swarm cursors assemble the real page live. No API key. Exports to Next.js, React, Vue, Nuxt, Svelte, SvelteKit and Astro.",
   "keywords": [
     "agents",
     "agents-md",

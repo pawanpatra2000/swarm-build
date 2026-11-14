@@ -2,10 +2,10 @@
 
 Describe a page. A planner sets the design direction and splits the page into sections. One agent per section builds its part **at the same time**, and a live preview shows each agent's cursor assembling the real UI. Then you click anything on the page to leave a comment, and only that section gets rebuilt.
 
-It works two ways:
-
-- **Inside any coding agent** (Claude Code, Codex, Cursor, Kiro, T3 Code, or anything with a shell or MCP). Your agent does the thinking with its own model and its sub-agents build the sections. **No API key.**
-- **Standalone.** swarm-build calls a model itself (Claude, OpenAI, Gemini or Vertex AI).
+It runs **inside the coding agent you already use**: Claude Code, Codex, Cursor, Kiro, T3 Code, or anything that can run a shell command or use MCP.
+- **Your agent's own model** does the design thinking, and its own sub-agents build the sections.
+- **swarm-build never calls a model.** It needs no API key, no account and adds no cost beyond your agent plan.
+- **It provides** the live preview, the shared design system, the checks and the framework export.
 
 The finished page goes straight into your project's framework: Next.js, React, Vue, Nuxt, Svelte, SvelteKit, Astro or plain HTML.
 
@@ -31,7 +31,8 @@ Then tell your agent: **"swarm build a landing page for a yoga studio in Goa"**.
 2. Plan the design direction, theme, type scale and sections.
 3. Start one sub-agent per section, all in parallel.
 4. Run design checks and fix weak sections.
-5. Ask you to comment. Click anything in the preview, then say "apply the swarm comments".
+5. Ask you to comment. Click anything in the preview and write the change. Then click **Copy request for your agent** and paste it into the chat. Only those sections are rebuilt, live.
+6. Export the page into your project's framework.
 
 What `init` writes:
 
@@ -45,25 +46,6 @@ What `init` writes:
 
 Add `--agent claude,codex` to choose agents and `--global` to install for your user instead of the project. `.swarm/` is added to `.gitignore`.
 
-## Quickstart: standalone
-
-```bash
-export ANTHROPIC_API_KEY=...     # or OPENAI_API_KEY, GEMINI_API_KEY, or gcloud + GCP_PROJECT for Vertex AI
-npx swarm-build run "Landing page for a Pune bakery: menu, hours, order form" --open
-npx swarm-build run --brief-file brief.txt --impeccable --open
-```
-
-The build starts when the preview opens (`--now` to start right away, `--headless` for no preview). The server stays up afterwards so comments can be applied. Click **Apply comments** in the preview.
-
-Options:
-
-- `--sections N`: 2 to 8.
-- `--theme theme.json`: forces brand tokens.
-- `--design-file DESIGN.md`: your design system. A `DESIGN.md` in the folder is used automatically.
-- `--no-review`: skips the review step.
-- `--impeccable`: adds the Impeccable detector to the review.
-- `SWARM_PROVIDER` and `SWARM_MODEL` pick the model. Use `SWARM_PRICE_IN` and `SWARM_PRICE_OUT` for cost display with other models.
-
 ## The preview
 
 - The **Planner** cursor picks a direction. Then each agent gets a dashed slot and a live character count.
@@ -73,9 +55,9 @@ Options:
 - **Comment** (or press `C`): click any element and write what should change. Pins stay on the element.
 - **Replay** at 1×, 2× or 3×. Long idle gaps are squeezed to 3 s. **Go live** hides the cursors.
 
-## Agent-mode commands
+## Commands
 
-These are the commands the skill uses; you can run them by hand too.
+These are the commands your agent runs. You can run them by hand too.
 
 ```
 swarm-build start --brief-file brief.txt --agent "Claude Code"
@@ -120,6 +102,13 @@ Tested:
 
 Forms and buttons come without handlers; wire them to your app.
 
+## Recording a video
+
+```bash
+npm i -D playwright && npx playwright install chromium
+node tools/record.mjs .swarm/<run> --speed 2 --out demo.mp4   # needs ffmpeg
+```
+
 ## Output and exports
 
 Each run is a folder `.swarm/<run>/`:
@@ -142,18 +131,19 @@ Other exports:
 - **Review**:
   - Deterministic checks: opacity-on-variables bug, hard-coded colours, buzzwords, fake proof, heading structure, unlabelled fields, repeated layouts.
   - Optional [Impeccable](https://github.com/pbakaus/impeccable) detector, run on the rendered page.
-  - A model review that picks at most 3 sections to rebuild.
+  - Your agent reads the findings and the page, then rebuilds at most 3 weak sections in parallel.
 - **Your design system**: `DESIGN.md` in the project overrides the defaults.
 - `init --design` installs Impeccable (Apache-2.0) and [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (MIT) with their own installers, so your agent can use them while planning.
 
 ## Measured
 
-| Run | Planning | Parallel build | One after another | Speed-up | Cost |
-|---|---|---|---|---|---|
-| Standalone, Gemini 3.5 Flash, 6 sections + review | 22.4 s | 17.4 s | 77.4 s | 4.5× | $0.32 |
-| Agent mode, 6 sub-agents (yoga studio) | done by the agent | 54.2 s | 134.4 s | 2.5× | your agent's plan |
+Yoga studio page, 6 sections, one coding agent with 6 sub-agents:
 
-Sub-agents are slower per section than direct model calls, because each one is a full agent that reads its instructions and writes a file. They still finish together.
+| Parallel build | Same sections one after another | Speed-up | Extra cost |
+|---|---|---|---|
+| 54.2 s | 134.4 s | 2.5× | none (your agent plan) |
+
+The speed-up depends on how many sub-agents your agent runs at once. If your agent has no sub-agents, it builds the sections one after another; the preview still works.
 
 ## Limits
 

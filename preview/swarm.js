@@ -22,7 +22,7 @@
     events: [], received: -1, timers: [], token: 0, ready: false, queue: [],
     mode: 'idle', scale: 1, plan: null, meta: null, stats: null,
     agents: new Map(), planner: null, reviewer: null, animating: 0, clock: null, clockStop: null,
-    userScrollAt: 0, finaleShown: false, commenting: false, comments: new Map(), canApply: false,
+    userScrollAt: 0, finaleShown: false, commenting: false, comments: new Map(),
     hoverEl: null, popTarget: null, replaying: false,
   };
   window.__swarm = S;
@@ -648,13 +648,18 @@ html,body{margin:0;overflow:hidden}
     const r = await fetch('api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section, target, path, text }) });
     if (!r.ok) showError(`Comment failed: ${(await r.json().catch(() => ({}))).error || r.status}`);
   }
+  // Comments are applied by the user's coding agent; copy the request so it can be pasted into the chat.
+  const AGENT_REQUEST = 'Apply the swarm-build comments: run `npx -y swarm-build comments` and follow the skill.';
   async function applyComments() {
-    const r = await fetch('api/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-    const j = await r.json().catch(() => ({}));
     const msg = $('#apply-msg');
     msg.hidden = false;
-    msg.textContent = j.started ? 'Agents are on it…' : (j.message || 'Ask your coding agent to apply the comments.');
-    if (j.started) setCommenting(false);
+    try {
+      await navigator.clipboard.writeText(AGENT_REQUEST);
+      msg.textContent = 'Copied. Paste it to your coding agent; its sub-agents rebuild the commented sections here.';
+    } catch {
+      msg.textContent = `Tell your coding agent: "${AGENT_REQUEST}"`;
+    }
+    setCommenting(false);
   }
   function showError(t) { const e = $('#error'); e.textContent = t; e.hidden = false; setTimeout(() => (e.hidden = true), 5000); }
 
@@ -796,7 +801,6 @@ html,body{margin:0;overflow:hidden}
   requestAnimationFrame(frame);
 
   if (!EMBED) {
-    fetch('api/run').then((r) => r.json()).then((j) => { S.canApply = Boolean(j.canApply); }).catch(() => {});
     const es = new EventSource('events');
     es.onopen = () => setPhase(S.mode === 'idle' ? 'waiting' : S.mode);
     es.onmessage = (m) => intake(JSON.parse(m.data));

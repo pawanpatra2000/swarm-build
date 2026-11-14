@@ -70,6 +70,13 @@ test('framework exports write the right files', () => {
   assert.ok(existsSync(svelteDir));
 });
 
+test('there is no API-key mode', () => {
+  const r = spawnSync(process.execPath, [BIN, 'run', 'a page'], { cwd: dir, encoding: 'utf8' });
+  assert.notEqual(r.status, 0);
+  assert.match(r.stderr, /no API-key mode.*swarm-build guide/);
+  assert.doesNotMatch(sb('--help'), /API_KEY|swarm-build run/);
+});
+
 test('MCP server lists tools and reports errors', () => {
   const input = [
     { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 't', version: '1' } } },

@@ -50,13 +50,6 @@ Output rules:
 - Links to other sections use href="#section-id". Buttons are <a> or <button type="button">. Forms do not submit anywhere (no action attribute).
 - Accessible: one <h1> only in the hero, sections use <h2>, labelled form fields, alt or aria-label where needed.`;
 
-export const REVIEW_SYSTEM = `You are a design reviewer. You get a page plan, the HTML of each section and automated findings. Decide which sections need a rebuild and say exactly what to change.
-
-${DESIGN_PRINCIPLES}
-
-Return JSON only: {"summary": one sentence, "fixes": [{"id": section id, "problem": what is wrong, "change": precise instruction for the rebuild}]}
-Only include sections with real problems: broken or missing content from the brief, poor contrast, a layout that repeats the previous section, generic AI-looking patterns, invented claims, inconsistent use of the shared classes, mobile overflow risk. At most 3 fixes. An empty list is a fine answer.`;
-
 export const EDIT_SYSTEM = `${BUILDER_SYSTEM}
 
 You are now editing a section you already built. A reviewer left a comment on it. Rewrite the whole section with the change applied and keep everything else as it is. Output the full section, not a diff.`;
@@ -84,17 +77,6 @@ Name: ${section.name}
 Layout: ${section.layout || 'your choice, different from the neighbouring sections'}
 Height: ${section.height}
 Brief: ${section.brief}${section.fix ? `\n\nThis is a rebuild. Reviewer feedback to apply: ${section.fix}` : ''}`;
-}
-
-export function reviewPrompt(plan, sections, findings) {
-  return `Plan:
-${JSON.stringify({ title: plan.title, design: plan.design, sections: plan.sections }, null, 1)}
-
-Automated findings:
-${findings.length ? findings.map((f) => `- [${f.source}] ${f.id ? `${f.id}: ` : ''}${f.message}`).join('\n') : '- none'}
-
-Sections:
-${sections.map((s) => `### ${s.id}\n${s.html.length > 16000 ? `${s.html.slice(0, 16000)}\n[... ${s.html.length - 16000} more characters not shown here; the section itself is complete]` : s.html}`).join('\n\n')}`;
 }
 
 export function editPrompt(plan, section, html, comment) {
