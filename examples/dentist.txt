@@ -1,0 +1,11 @@
+Landing page for "Smile Studio Dental", a sample family dental clinic in Koregaon Park, Pune.
+
+What the page must cover:
+- Header: clinic wordmark with a small tooth icon, nav links (Treatments, Clinic, Hours, Book), a "Book a visit" button.
+- Hero: calm headline about gentle dental care for the whole family, one sentence on what to expect at a first visit, two buttons (Book a visit, Call the clinic), and an illustration made with inline SVG (tooth and toothbrush).
+- Treatments: 6 cards (check-up and cleaning, fillings, root canal, braces and aligners, teeth whitening, kids dentistry), each with an icon, one honest sentence and a typical visit length.
+- First visit, step by step: 4 steps (book, short health form, exam and X-ray if needed, a written treatment plan with prices before any work).
+- Hours and location: opening hours table (Mon-Sat 10:00-19:00, Sun closed), address placeholder in Koregaon Park, phone placeholder, and a simple booking form (name, phone, preferred day, reason).
+- Footer: links, a line that this is a sample page, copyright 2026.
+
+Style: clean and friendly. Page background #f7fbfb, surface #e8f3f2, cards #ffffff, ink #12302f, muted #4b6463, rules #d3e4e2, accent teal #0f766e, text on accent #ffffff, pale accent tint #d5efec, dark band #0b3b3a with text #eefaf8. Radius 16px. Body font "Inter", heading font "DM Serif Display". No testimonials, no ratings, no patient counts, no prices.
