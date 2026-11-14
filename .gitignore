@@ -2,3 +2,4 @@ node_modules/
 out/
 *.webm
 .DS_Store
+.swarm/

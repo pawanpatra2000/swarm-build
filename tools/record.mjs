@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // Records a swarm-build run to MP4 and screenshots the result.
-//   node tools/record.mjs [--speed 1] [--out demo.mp4] [--port 4790] -- "<brief>" [server args...]
-//   node tools/record.mjs --out replay.mp4 -- --replay out/<run>/run.json
+//   node tools/record.mjs [--speed 1] [--out demo.mp4] [--port 4790] -- --brief-file brief.txt [run args...]
 // Needs: npm i playwright, a Chromium build (npx playwright install chromium), ffmpeg on PATH.
 import { spawn, execFileSync } from 'node:child_process';
 import { mkdir, rm } from 'node:fs/promises';
@@ -20,7 +19,7 @@ const port = Number(opt('--port', 4790));
 const out = path.resolve(opt('--out', path.join(ROOT, 'out', 'demo.mp4')));
 const W = 1600, H = 1000;
 
-const server = spawn(process.execPath, [path.join(ROOT, 'src/server.mjs'), ...serverArgs, '--port', String(port)], { cwd: ROOT, env: process.env });
+const server = spawn(process.execPath, [path.join(ROOT, 'bin/swarm-build.mjs'), 'run', ...serverArgs, '--port', String(port)], { cwd: path.join(ROOT, 'out'), env: process.env });
 server.stderr.pipe(process.stderr);
 await new Promise((resolve, reject) => {
   server.stdout.on('data', (d) => {
@@ -47,12 +46,11 @@ await context.close();
 const webm = await video.path();
 
 // Screenshots of the generated page: desktop + mobile, full length.
-const dir = String(stats.outDir).split(/[\\/]/).pop();
 const shots = [];
 for (const [name, vp] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 390, height: 844 }]]) {
   const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: name === 'mobile' ? 2 : 1 });
   const p = await ctx.newPage();
-  await p.goto(`http://127.0.0.1:${port}/out/${dir}/index.html`, { waitUntil: 'networkidle' });
+  await p.goto(`http://127.0.0.1:${port}/page`, { waitUntil: 'networkidle' });
   await p.waitForTimeout(800);
   const file = path.join(stats.outDir, `screenshot-${name}.png`);
   await p.screenshot({ path: file, fullPage: true });

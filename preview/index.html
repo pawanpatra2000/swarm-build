@@ -6,23 +6,26 @@
 <title>swarm-build</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap">
-<!-- Same Tailwind runtime as the generated page, so the preview renders sections exactly as the output does. -->
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="/swarm.css">
+<link rel="stylesheet" href="swarm.css">
 </head>
 <body>
 <header id="topbar">
   <div class="brand"><span class="logo" aria-hidden="true"></span>swarm-build</div>
-  <div id="brief" class="brief" title=""></div>
+  <div id="brief" class="brief"></div>
   <div class="chips">
     <span id="model" class="chip"></span>
     <span id="phase" class="chip phase">connecting</span>
     <span id="timer" class="chip mono">0.0s</span>
-    <div class="speed" role="group" aria-label="Animation speed">
+    <div class="seg" role="group" aria-label="Device">
+      <button type="button" data-device="desktop" aria-pressed="true" title="Desktop (1280px)">Desktop</button>
+      <button type="button" data-device="mobile" aria-pressed="false" title="Mobile (390px)">Mobile</button>
+    </div>
+    <div class="seg" role="group" aria-label="Animation speed">
       <button type="button" data-speed="1">1×</button>
       <button type="button" data-speed="2">2×</button>
       <button type="button" data-speed="3">3×</button>
     </div>
+    <button type="button" id="comment-toggle" class="ghost" aria-pressed="false" title="Click any element to leave a comment (C)">Comment</button>
     <button type="button" id="replay-top" class="ghost">Replay</button>
   </div>
 </header>
@@ -30,19 +33,40 @@
 <main id="main">
   <section id="canvas" aria-label="Live build preview">
     <div id="frame">
-      <div class="frame-bar"><i></i><i></i><i></i><span id="frame-url">preview</span></div>
-      <div id="frame-body"><div id="stage"></div></div>
+      <div class="frame-bar"><i></i><i></i><i></i><span id="frame-url">preview</span><a id="open-page-bar" href="page" target="_blank" rel="noopener">open page ↗</a></div>
+      <div id="frame-body"><iframe id="stage" title="Page being built" scrolling="no"></iframe></div>
     </div>
   </section>
   <aside id="panel">
     <h2>Agents</h2>
     <ul id="agents"></ul>
+    <div id="review-box" hidden>
+      <h2>Design review</h2>
+      <div id="review"></div>
+    </div>
+    <div id="comments-box">
+      <h2>Comments <span id="comment-count"></span></h2>
+      <p class="hint" id="comment-hint">Press <kbd>C</kbd> or click Comment, then click any part of the page.</p>
+      <ol id="comments"></ol>
+      <button type="button" id="apply" class="primary small" hidden>Apply comments</button>
+      <p class="hint" id="apply-msg" hidden></p>
+    </div>
     <h2>Log</h2>
     <ol id="log"></ol>
   </aside>
 </main>
 
 <div id="overlay" aria-hidden="true"></div>
+
+<form id="popover" hidden>
+  <div class="pop-target" id="pop-target"></div>
+  <label for="pop-text" class="sr-only">Comment</label>
+  <textarea id="pop-text" rows="3" placeholder="What should change here?" required></textarea>
+  <div class="pop-actions">
+    <button type="button" id="pop-cancel" class="ghost small">Cancel</button>
+    <button type="submit" class="primary small">Add comment</button>
+  </div>
+</form>
 
 <div id="finale" hidden>
   <div class="card">
@@ -57,13 +81,14 @@
     </dl>
     <div class="actions">
       <button type="button" id="go-live" class="primary">Go live</button>
+      <button type="button" id="comment-now" class="ghost">Leave comments</button>
       <button type="button" id="replay" class="ghost">Replay</button>
-      <a id="open-page" class="ghost" href="#" target="_blank" rel="noopener">Open page</a>
+      <a id="open-page" class="ghost" href="page" target="_blank" rel="noopener">Open page</a>
     </div>
   </div>
 </div>
 
 <div id="error" hidden></div>
-<script src="/swarm.js"></script>
+<script src="swarm.js"></script>
 </body>
 </html>

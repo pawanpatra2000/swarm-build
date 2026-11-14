@@ -1,20 +1,48 @@
 {
   "name": "swarm-build",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Plan a UI into sections, build every section in parallel with AI agents, and watch swarm cursors assemble the real page live.",
+  "version": "0.2.0",
+  "description": "Plan a UI into sections, build every section in parallel with AI agents, and watch swarm cursors assemble the real page live. Works standalone or inside Claude Code, Codex, Cursor and Kiro.",
   "type": "module",
   "bin": {
-    "swarm-build": "src/server.mjs"
+    "swarm-build": "bin/swarm-build.mjs"
   },
   "scripts": {
-    "start": "node src/server.mjs",
+    "start": "node bin/swarm-build.mjs",
+    "test": "node --test test/",
     "record": "node tools/record.mjs"
   },
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
+  "files": [
+    "bin/",
+    "src/",
+    "preview/",
+    "skill/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ai",
+    "agents",
+    "ui",
+    "landing-page",
+    "parallel",
+    "claude-code",
+    "codex",
+    "cursor",
+    "kiro",
+    "mcp",
+    "tailwind",
+    "design"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pawanpatra2000/swarm-build.git"
+  },
+  "private": true,
+  "devDependencies": {
     "playwright": "^1.64.1"
   }
 }

@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>swarm-build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap">
+<style>/* Preview chrome. The page being built lives in the #stage iframe with its own CSS. */
+:root {
+  --studio: #101114;
+  --studio-2: #17181d;
+  --studio-3: #22242b;
+  --studio-line: #2c2f38;
+  --studio-ink: #eceef3;
+  --studio-muted: #8d93a3;
+  --studio-accent: #f2b84b;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--studio); color: var(--studio-ink); font: 14px/1.4 Inter, system-ui, sans-serif; overflow: hidden; }
+button, input, textarea { font: inherit; color: inherit; }
+button { border: 0; background: none; padding: 0; cursor: pointer; }
+h2, ol, ul, p, dl, dd { margin: 0; }
+.mono { font-family: var(--mono); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+kbd { font: 11px var(--mono); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--studio-line); background: var(--studio-3); color: var(--studio-ink); }
+:focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 2px; }
+
+#topbar { height: 56px; display: flex; align-items: center; gap: 16px; padding: 0 16px; border-bottom: 1px solid var(--studio-line); background: var(--studio-2); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.logo { width: 22px; height: 22px; border-radius: 6px; background: conic-gradient(#e4572e, #d4a017, #2a9d8f, #2e86ab, #7b2cbf, #c2185b, #e4572e); }
+.brief { flex: 1; min-width: 0; color: var(--studio-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chips { display: flex; align-items: center; gap: 8px; }
+.chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--studio-3); border: 1px solid var(--studio-line); color: var(--studio-muted); white-space: nowrap; }
+.chip.phase { color: var(--studio-accent); }
+.chip.mono { color: var(--studio-ink); min-width: 64px; text-align: center; }
+.seg { display: flex; border: 1px solid var(--studio-line); border-radius: 8px; overflow: hidden; }
+.seg button { font-size: 12px; padding: 5px 9px; color: var(--studio-muted); background: var(--studio-3); }
+.seg button + button { border-left: 1px solid var(--studio-line); }
+.seg button[aria-pressed='true'] { color: #111; background: var(--studio-accent); font-weight: 600; }
+.ghost { display: inline-flex; align-items: center; font-size: 13px; padding: 6px 12px; border-radius: 8px; color: var(--studio-ink); border: 1px solid var(--studio-line); background: var(--studio-3); text-decoration: none; }
+.ghost:hover { border-color: var(--studio-muted); }
+.ghost[aria-pressed='true'] { background: var(--studio-accent); color: #111; border-color: var(--studio-accent); font-weight: 600; }
+.primary { font-size: 14px; padding: 8px 18px; border-radius: 8px; font-weight: 600; color: #111; background: var(--studio-accent); }
+.primary:hover { filter: brightness(1.08); }
+.small { font-size: 12px; padding: 6px 12px; }
+
+#main { display: grid; grid-template-columns: 1fr 340px; height: calc(100vh - 56px); }
+#canvas { position: relative; overflow: auto; padding: 24px; background-color: var(--studio); background-image: radial-gradient(circle, #262932 1px, transparent 1px); background-size: 22px 22px; scrollbar-width: thin; }
+#frame { margin: 0 auto; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .06); transition: width .35s ease; }
+.frame-bar { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: #e9e7e3; }
+.frame-bar i { width: 11px; height: 11px; border-radius: 50%; background: #cfcac2; flex: none; }
+.frame-bar span { margin-left: 12px; font: 12px var(--mono); color: #6b665e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.frame-bar a { font: 12px var(--mono); color: #6b665e; text-decoration: none; white-space: nowrap; }
+.frame-bar a:hover { color: #111; }
+#frame-body { position: relative; overflow: hidden; background: #fff; }
+#stage { display: block; border: 0; transform-origin: 0 0; background: #fff; }
+body.commenting #canvas { cursor: crosshair; }
+
+/* Side panel */
+#panel { border-left: 1px solid var(--studio-line); background: var(--studio-2); padding: 18px; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+#panel h2 { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--studio-muted); margin-top: 8px; }
+#agents { list-style: none; padding: 0; display: grid; gap: 8px; }
+#agents li { display: grid; grid-template-columns: 10px 1fr auto; gap: 4px 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--studio-3); border: 1px solid var(--studio-line); }
+#agents .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+#agents .who { font-weight: 600; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#agents .who small { font-weight: 400; color: var(--studio-muted); margin-left: 6px; }
+#agents .t { font: 12px var(--mono); color: var(--studio-muted); }
+#agents .what { grid-column: 2 / 4; font: 12px var(--mono); color: var(--studio-muted); }
+#agents li[data-status='building'], #agents li[data-status='thinking'] { border-color: color-mix(in srgb, var(--c) 70%, transparent); }
+#agents li[data-status='done'] .what { color: #86efac; }
+#agents li[data-status='failed'] .what { color: #fca5a5; }
+#review { font-size: 13px; color: var(--studio-muted); display: grid; gap: 6px; }
+#review b { color: var(--studio-ink); }
+#review .fix { padding: 8px 10px; border-radius: 8px; background: var(--studio-3); border: 1px solid var(--studio-line); }
+#review .fix strong { color: var(--studio-accent); font-weight: 600; }
+.hint { font-size: 12px; color: var(--studio-muted); }
+#comments { list-style: none; padding: 0; display: grid; gap: 8px; }
+#comments li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 9px 10px; border-radius: 8px; background: var(--studio-3); border: 1px solid var(--studio-line); font-size: 13px; cursor: pointer; }
+#comments li .n { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--studio-accent); color: #111; font: 600 11px var(--mono); }
+#comments li small { display: block; color: var(--studio-muted); font: 11px var(--mono); margin-top: 3px; }
+#comments li[data-status='resolved'] { opacity: .55; }
+#comments li[data-status='resolved'] .n { background: #86efac; }
+#comments li[data-status='working'] .n { background: #93c5fd; }
+#comment-count { color: var(--studio-accent); }
+#log { list-style: none; padding: 0; font: 12px/1.6 var(--mono); color: var(--studio-muted); }
+#log li b { color: var(--studio-ink); font-weight: 600; }
+#log li span { color: #5d6270; margin-right: 8px; }
+
+/* Cursor overlay: fixed, positioned in client coordinates every frame. */
+#overlay { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+.cursor { position: absolute; left: 0; top: 0; will-change: transform; transition: opacity .5s; }
+.cursor svg { display: block; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35)); }
+.cursor .tag { position: absolute; left: 16px; top: 18px; padding: 2px 8px; border-radius: 6px; background: var(--c); color: #fff; font: 600 12px Inter, sans-serif; white-space: nowrap; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); }
+.cursor .bubble { position: absolute; left: 16px; top: 42px; padding: 3px 8px; border-radius: 6px; background: rgba(17, 17, 17, .86); color: #fff; font: 11px var(--mono); white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.cursor.parked { opacity: .45; }
+.cursor.gone { opacity: 0; }
+.dragbox { position: absolute; left: 0; top: 0; border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 10%, transparent); border-radius: 2px; }
+.dragbox .dim { position: absolute; right: -1px; bottom: -22px; padding: 1px 6px; border-radius: 4px; background: var(--c); color: #fff; font: 10px var(--mono); white-space: nowrap; }
+.dragbox.media { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--c) 18%, transparent) 0 8px, transparent 8px 16px); animation: pulse .6s ease-in-out infinite alternate; }
+.dragbox.rework { border-style: dashed; background: color-mix(in srgb, var(--c) 6%, transparent); animation: pulse .9s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: .5; } to { opacity: 1; } }
+.hoverbox { position: absolute; left: 0; top: 0; border: 2px solid var(--studio-accent); background: rgba(242, 184, 75, .08); border-radius: 3px; }
+.hoverbox span { position: absolute; left: -2px; top: -22px; padding: 1px 6px; border-radius: 4px; background: var(--studio-accent); color: #111; font: 600 11px var(--mono); white-space: nowrap; }
+.pin { position: absolute; left: 0; top: 0; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50% 50% 50% 4px; background: var(--studio-accent); color: #111; display: grid; place-items: center; font: 700 11px var(--mono); box-shadow: 0 3px 10px rgba(0, 0, 0, .35); transition: opacity .3s; }
+.pin.resolved { background: #86efac; opacity: .7; }
+.pin.working { background: #93c5fd; }
+
+#popover { position: fixed; z-index: 60; width: 300px; padding: 12px; border-radius: 12px; background: var(--studio-2); border: 1px solid var(--studio-line); box-shadow: 0 20px 50px rgba(0, 0, 0, .5); display: grid; gap: 8px; }
+#popover[hidden] { display: none; }
+.pop-target { font: 11px var(--mono); color: var(--studio-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#popover textarea { width: 100%; resize: vertical; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--studio-line); background: var(--studio-3); }
+.pop-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* Finale */
+#finale { position: fixed; inset: 56px 340px 0 0; display: grid; place-items: center; z-index: 50; background: rgba(10, 10, 12, .55); backdrop-filter: blur(2px); }
+#finale[hidden] { display: none; }
+#finale .card { width: min(600px, 92%); padding: 30px 32px; border-radius: 18px; background: var(--studio-2); border: 1px solid var(--studio-line); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); animation: rise .5s cubic-bezier(.2, .9, .3, 1.2); }
+@keyframes rise { from { transform: translateY(20px) scale(.96); opacity: 0; } }
+#finale .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--studio-accent); }
+#finale .big { font: 700 64px/1.05 Inter, sans-serif; letter-spacing: -0.03em; margin: 8px 0 4px; }
+#finale .sub { color: var(--studio-muted); font-size: 15px; }
+#finale .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 22px 0; }
+#finale .grid div { background: var(--studio-3); border: 1px solid var(--studio-line); border-radius: 10px; padding: 10px 12px; }
+#finale dt { font-size: 12px; color: var(--studio-muted); }
+#finale dd { margin: 4px 0 0; font: 600 20px var(--mono); }
+#finale .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+#error { position: fixed; left: 50%; top: 72px; transform: translateX(-50%); z-index: 70; background: #7f1d1d; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; max-width: 80vw; }
+#error[hidden] { display: none; }
+</style>
+</head>
+<body>
+<header id="topbar">
+  <div class="brand"><span class="logo" aria-hidden="true"></span>swarm-build</div>
+  <div id="brief" class="brief"></div>
+  <div class="chips">
+    <span id="model" class="chip"></span>
+    <span id="phase" class="chip phase">connecting</span>
+    <span id="timer" class="chip mono">0.0s</span>
+    <div class="seg" role="group" aria-label="Device">
+      <button type="button" data-device="desktop" aria-pressed="true" title="Desktop (1280px)">Desktop</button>
+      <button type="button" data-device="mobile" aria-pressed="false" title="Mobile (390px)">Mobile</button>
+    </div>
+    <div class="seg" role="group" aria-label="Animation speed">
+      <button type="button" data-speed="1">1×</button>
+      <button type="button" data-speed="2">2×</button>
+      <button type="button" data-speed="3">3×</button>
+    </div>
+    <button type="button" id="comment-toggle" class="ghost" aria-pressed="false" title="Click any element to leave a comment (C)">Comment</button>
+    <button type="button" id="replay-top" class="ghost">Replay</button>
+  </div>
+</header>
+
+<main id="main">
+  <section id="canvas" aria-label="Live build preview">
+    <div id="frame">
+      <div class="frame-bar"><i></i><i></i><i></i><span id="frame-url">preview</span><a id="open-page-bar" href="page" target="_blank" rel="noopener">open page ↗</a></div>
+      <div id="frame-body"><iframe id="stage" title="Page being built" scrolling="no"></iframe></div>
+    </div>
+  </section>
+  <aside id="panel">
+    <h2>Agents</h2>
+    <ul id="agents"></ul>
+    <div id="review-box" hidden>
+      <h2>Design review</h2>
+      <div id="review"></div>
+    </div>
+    <div id="comments-box">
+      <h2>Comments <span id="comment-count"></span></h2>
+      <p class="hint" id="comment-hint">Press <kbd>C</kbd> or click Comment, then click any part of the page.</p>
+      <ol id="comments"></ol>
+      <button type="button" id="apply" class="primary small" hidden>Apply comments</button>
+      <p class="hint" id="apply-msg" hidden></p>
+    </div>
+    <h2>Log</h2>
+    <ol id="log"></ol>
+  </aside>
+</main>
+
+<div id="overlay" aria-hidden="true"></div>
+
+<form id="popover" hidden>
+  <div class="pop-target" id="pop-target"></div>
+  <label for="pop-text" class="sr-only">Comment</label>
+  <textarea id="pop-text" rows="3" placeholder="What should change here?" required></textarea>
+  <div class="pop-actions">
+    <button type="button" id="pop-cancel" class="ghost small">Cancel</button>
+    <button type="submit" class="primary small">Add comment</button>
+  </div>
+</form>
+
+<div id="finale" hidden>
+  <div class="card">
+    <div class="kicker">Build complete</div>
+    <div class="big"><span id="f-wall">0s</span></div>
+    <div class="sub" id="f-line"></div>
+    <dl class="grid">
+      <div><dt>Agents in parallel</dt><dd id="f-agents"></dd></div>
+      <div><dt>One agent, one after another</dt><dd id="f-seq"></dd></div>
+      <div><dt>Speed-up</dt><dd id="f-speed"></dd></div>
+      <div><dt>Model cost</dt><dd id="f-cost"></dd></div>
+    </dl>
+    <div class="actions">
+      <button type="button" id="go-live" class="primary">Go live</button>
+      <button type="button" id="comment-now" class="ghost">Leave comments</button>
+      <button type="button" id="replay" class="ghost">Replay</button>
+      <a id="open-page" class="ghost" href="page" target="_blank" rel="noopener">Open page</a>
+    </div>
+  </div>
+</div>
+
+<div id="error" hidden></div>
+<script>window.__SWARM_EMBED__={"events":[{"t":1,"type":"meta","brief":"Landing page for \"Saltwater Yoga\", a small yoga studio in Assagao, North Goa (sample page).\nSections: header with wordmark and nav (Classes, Teachers, Timetable, Visit) and a \"Book a class\" button; hero about slow morning practice near the sea with two buttons (Book a class, See timetable) and an inline SVG illustration of waves and sun; class styles (Hatha, Vinyasa, Yin, Pranayama, Beginners' series) each with level and length; weekly timetable as a real table (Mon-Sat 7:00 and 17:30, Sun 8:00 only); first visit info (what to bring, arrive 10 minutes early, mats provided, no experience needed) plus a simple booking form (name, phone, class, day); footer with address placeholder in Assagao, opening hours, and a line saying this is a sample page.\nTone: calm, sunny, unhurried. Colours: sand and sea, not purple. No testimonials, ratings, student counts or prices.","model":"Claude (as coding agent)","mode":"agent"},{"t":1,"type":"plan:start"},{"t":49711,"type":"plan:done","plan":{"title":"Saltwater Yoga, Assagao","description":"A small yoga studio in Assagao, North Goa: slow morning and evening classes, a weekly timetable and easy first-visit booking.","lang":"en","design":{"direction":"Sun-bleached and unhurried, like an early morning by the sea. Big calm serif headlines, lots of sand-coloured air, and a single sea-teal accent used only for actions. Sections change rhythm: a split hero with a wave illustration, an editorial list of class styles (not a card grid), a real timetable table on a deep-sea band, and a two-column first-visit block with a form. Thin wave-line dividers tie it together.","scale":{"h1":"76px","h2":"46px","h3":"22px","body":"17px","small":"14px"},"sectionY":"112px","maxWidth":"70rem","motifs":["a thin hand-drawn wave line used as a divider or underline","a small sun circle used sparingly as a bullet or accent"],"avoid":["stock 'zen' imagery like lotus emoji or purple gradients","three identical feature cards in a row","wellness buzzwords like 'transform' or 'journey'"]},"theme":{"bg":"#f6f1e7","surface":"#ece3d2","card":"#fffdf8","ink":"#1d2b2a","muted":"#52605e","accent":"#0e6e6a","accentInk":"#ffffff","accentSoft":"#d6ebe6","dark":"#12403f","darkInk":"#f4efe4","line":"#ddd3c1","radius":"18px","font":"Figtree","headingFont":"Young Serif"},"voice":"Calm, warm and plain. Short sentences, concrete details (times, what to bring), no wellness clichés.","sections":[{"id":"header","name":"Header","layout":"Single row: wordmark left, nav centre, button right; collapses to wordmark + button on mobile.","brief":"Wordmark 'Saltwater Yoga' in the heading font with a small sun-circle mark. Nav links: Classes (#classes), Teachers (#visit), Timetable (#timetable), Visit (#visit). A primary 'Book a class' button linking to #visit. Light background with a thin bottom rule.","height":"short","agent":{"name":"Ada","color":"#e4572e"}},{"id":"hero","name":"Hero","layout":"Asymmetric split: text on the left (7 columns), illustration on the right (5 columns).","brief":"Eyebrow 'Assagao, North Goa'. H1 about slow practice in the morning, a few minutes from the sea (for example 'Slow mornings, steady breath.'). One lead sentence: small classes, open to beginners, held in a shaded studio in Assagao. Two buttons: 'Book a class' (#visit, primary) and 'See timetable' (#timetable, ghost). Right side: an inline SVG illustration of a low sun over three layered wave lines in teal and sand tones. Below the text, a short row of three facts: 'Classes of 12 or fewer', 'Mats provided', 'Mornings and evenings'.","height":"tall","agent":{"name":"Linus","color":"#2e86ab"}},{"id":"classes","name":"Class styles","layout":"Editorial list: a heading column on the left, a stacked list of styles on the right separated by thin rules (not cards).","brief":"H2 'Five ways to practise'. Short intro: every class can be adapted, so you can pick by mood, not by fitness. List five styles, each with name, one honest sentence, level and length: Hatha (all levels, 75 min, steady holds and alignment), Vinyasa (some experience helps, 60 min, breath-linked flow), Yin (all levels, 75 min, long floor holds), Pranayama (all levels, 45 min, breathing practice, seated), Beginners' series (new to yoga, 4 classes over 2 weeks, the basics step by step). Level and length shown as small tags.","height":"tall","agent":{"name":"Grace","color":"#7b2cbf"}},{"id":"timetable","name":"Timetable","layout":"Dark sea band with a real HTML table, days as rows and the two class times as columns.","brief":"Dark band (sb-dark). Eyebrow 'This week', H2 'Timetable'. A real \u003ctable> with caption: rows Monday to Sunday; columns 7:00 and 17:30. Mon Hatha / Vinyasa, Tue Vinyasa / Yin, Wed Hatha / Pranayama, Thu Vinyasa / Yin, Fri Hatha / Vinyasa, Sat Beginners' series / Yin, Sun 8:00 Hatha only (17:30 shows 'No class'). Note below: times can shift during the monsoon; check before you come. Make the table readable on mobile (scroll horizontally inside a wrapper).","height":"medium","agent":{"name":"Alan","color":"#2a9d8f"}},{"id":"visit","name":"First visit and booking","layout":"Two columns: first-visit checklist on the left, booking form card on the right.","brief":"H2 'Your first class'. Left: a short checklist with the sun motif as bullets: arrive 10 minutes early, wear clothes you can move in, mats and blocks are provided, bring water, no experience needed, tell the teacher about injuries. Also one line about the teachers: classes are led by the studio's resident teachers, who keep groups small. Right: a card with a booking form: name, phone, class (select with the five styles), preferred day (select Mon-Sun), and a 'Request a spot' primary button. Small note: we reply on WhatsApp within a day. Form has no action.","height":"tall","agent":{"name":"Margaret","color":"#d4a017"}},{"id":"footer","name":"Footer","layout":"Three short columns on a sand surface, then a bottom line.","brief":"Column 1: wordmark and one line 'Small yoga classes in Assagao, North Goa.' Column 2: address placeholder 'Studio address, Assagao, Goa 403507' and 'Open Mon-Sat 6:30-19:00, Sun 7:30-10:00'. Column 3: links to Classes, Timetable, Visit. Bottom line: '© 2026 Saltwater Yoga. This is a sample page.' A thin wave line above the footer.","height":"short","agent":{"name":"Dennis","color":"#c2185b"}}]},"stageCSS":":root{--bg:#f6f1e7;--surface:#ece3d2;--card:#fffdf8;--ink:#1d2b2a;--muted:#52605e;--accent:#0e6e6a;--accent-ink:#ffffff;--accent-soft:#d6ebe6;--dark:#12403f;--dark-ink:#f4efe4;--line:#ddd3c1;--radius:18px;--font:'Figtree',system-ui,sans-serif;--heading-font:'Young Serif','Figtree',serif;--h1:76px;--h2:46px;--h3:22px;--body:17px;--small:14px;--section-y:112px;--max-w:70rem}\nhtml{scroll-behavior:smooth}\nbody{font-family:var(--font);font-size:var(--body);line-height:1.6;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}\n.sb-wrap{max-width:var(--max-w);margin-inline:auto;padding-inline:24px}\n.sb-section{padding-block:clamp(56px,9vw,var(--section-y))}\n.sb-h1{font-family:var(--heading-font);font-size:clamp(calc(var(--h1)*.62),6.2vw,var(--h1));line-height:1.04;letter-spacing:-.02em;font-weight:600;text-wrap:balance}\n.sb-h2{font-family:var(--heading-font);font-size:clamp(calc(var(--h2)*.7),4.4vw,var(--h2));line-height:1.12;letter-spacing:-.015em;font-weight:600;text-wrap:balance}\n.sb-h3{font-family:var(--heading-font);font-size:var(--h3);line-height:1.3;font-weight:600}\n.sb-lead{font-size:calc(var(--body)*1.18);line-height:1.55;color:var(--muted);text-wrap:pretty}\n.sb-body{font-size:var(--body);line-height:1.6;color:var(--muted)}\n.sb-small{font-size:var(--small);line-height:1.5;color:var(--muted)}\n.sb-eyebrow{font-size:var(--small);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}\n.sb-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.7rem 1.25rem;border-radius:calc(var(--radius)*.75);font-weight:600;font-size:var(--small);line-height:1;transition:transform .15s,background-color .15s,border-color .15s;cursor:pointer;text-decoration:none}\n.sb-btn:hover{transform:translateY(-1px)}\n.sb-btn:focus-visible,.sb-card a:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n.sb-btn-primary{background:var(--accent);color:var(--accent-ink)}\n.sb-btn-primary:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}\n.sb-btn-ghost{border:1px solid var(--line);color:var(--ink);background:transparent}\n.sb-btn-ghost:hover{border-color:var(--ink)}\n.sb-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}\n.sb-dark{background:var(--dark);color:var(--dark-ink)}\n.sb-dark .sb-body,.sb-dark .sb-lead,.sb-dark .sb-small{color:color-mix(in srgb,var(--dark-ink) 78%,transparent)}\n.sb-input{width:100%;min-height:44px;padding:.65rem .85rem;border:1px solid var(--line);border-radius:calc(var(--radius)*.6);background:var(--card);color:var(--ink);font-size:var(--small)}\n@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}","fonts":"https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Young+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"},{"t":69890,"type":"agent:start","id":"header","agent":{"name":"Ada","color":"#e4572e"},"reason":"build"},{"t":71125,"type":"agent:start","id":"hero","agent":{"name":"Linus","color":"#2e86ab"},"reason":"build"},{"t":75078,"type":"agent:start","id":"classes","agent":{"name":"Grace","color":"#7b2cbf"},"reason":"build"},{"t":76592,"type":"agent:start","id":"timetable","agent":{"name":"Alan","color":"#2a9d8f"},"reason":"build"},{"t":80807,"type":"agent:start","id":"visit","agent":{"name":"Margaret","color":"#d4a017"},"reason":"build"},{"t":82535,"type":"agent:done","id":"header","agent":{"name":"Ada","color":"#e4572e"},"html":"\u003csection data-section=\"header\" id=\"header\" class=\"bg-[var(--bg)] border-b border-[var(--line)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cheader class=\"flex items-center justify-between gap-4 py-4\">\n      \u003ca href=\"#hero\" class=\"flex items-center gap-2 text-[var(--ink)] rounded-[var(--radius)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]\" aria-label=\"Saltwater Yoga, home\">\n        \u003csvg class=\"h-6 w-6 shrink-0 text-[var(--accent)]\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" aria-hidden=\"true\">\n          \u003ccircle cx=\"12\" cy=\"10\" r=\"4.5\"/>\n          \u003cpath d=\"M3 19c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0\"/>\n        \u003c/svg>\n        \u003cspan class=\"font-[family-name:var(--heading-font)] text-xl sm:text-2xl leading-none tracking-tight whitespace-nowrap\">Saltwater Yoga\u003c/span>\n      \u003c/a>\n      \u003cnav aria-label=\"Main\" class=\"hidden md:block\">\n        \u003cul class=\"flex items-center gap-8 sb-small\">\n          \u003cli>\u003ca href=\"#classes\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Classes\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Teachers\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#timetable\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Timetable\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Visit\u003c/a>\u003c/li>\n        \u003c/ul>\n      \u003c/nav>\n      \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px] shrink-0 whitespace-nowrap\">Book a class\u003c/a>\n    \u003c/header>\n  \u003c/div>\n\u003c/section>","ms":12645,"reason":"build","resolves":[],"chars":1925},{"t":89116,"type":"agent:done","id":"hero","agent":{"name":"Linus","color":"#2e86ab"},"html":"\u003csection data-section=\"hero\" id=\"hero\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)] overflow-hidden\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[70vh]\">\n      \u003cdiv class=\"lg:col-span-7\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" class=\"text-[var(--accent)]\">\u003ccircle cx=\"6\" cy=\"6\" r=\"4.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          Assagao, North Goa\n        \u003c/p>\n        \u003ch1 class=\"sb-h1 font-[family-name:var(--heading-font)] mt-4 max-w-[14ch]\">Slow mornings, steady breath.\u003c/h1>\n        \u003csvg aria-hidden=\"true\" class=\"mt-6 w-40 h-3 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\">\u003cpath d=\"M1 7c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 38-1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\u003c/svg>\n        \u003cp class=\"sb-lead text-[var(--muted)] mt-6 max-w-[60ch]\">Small classes, open to beginners, held in a shaded studio in Assagao, a few minutes from the sea.\u003c/p>\n        \u003cdiv class=\"mt-8 flex flex-col sm:flex-row gap-3\">\n          \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px]\">Book a class\u003c/a>\n          \u003ca href=\"#timetable\" class=\"sb-btn sb-btn-ghost min-h-[44px]\">See timetable\u003c/a>\n        \u003c/div>\n        \u003cul class=\"mt-12 pt-6 border-t border-[var(--line)] grid grid-cols-1 sm:grid-cols-3 gap-4 sb-small text-[var(--ink)]\">\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Classes of 12 or fewer\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mats provided\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mornings and evenings\n          \u003c/li>\n        \u003c/ul>\n      \u003c/div>\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--line)] p-6 sm:p-8\">\n          \u003csvg aria-hidden=\"true\" viewBox=\"0 0 400 420\" class=\"w-full h-auto\" fill=\"none\">\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" fill=\"var(--accent-soft)\"/>\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" stroke=\"var(--muted)\" stroke-width=\"1.5\"/>\n            \u003cline x1=\"20\" y1=\"230\" x2=\"380\" y2=\"230\" stroke=\"var(--line)\" stroke-width=\"1.5\"/>\n            \u003crect x=\"0\" y=\"231\" width=\"400\" height=\"190\" fill=\"var(--surface)\"/>\n            \u003cpath d=\"M10 262c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--accent)\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 312c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--muted)\" stroke-width=\"1.75\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 362c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":17990,"reason":"build","resolves":[],"chars":3394},{"t":95247,"type":"agent:done","id":"timetable","agent":{"name":"Alan","color":"#2a9d8f"},"html":"\u003csection data-section=\"timetable\" id=\"timetable\" class=\"sb-section sb-dark bg-[var(--dark)] text-[var(--dark-ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid gap-8 lg:grid-cols-12 lg:gap-12\">\n      \u003cdiv class=\"lg:col-span-4\">\n        \u003cp class=\"sb-eyebrow text-white/70\">This week\u003c/p>\n        \u003ch2 class=\"sb-h2 font-[family-name:var(--heading-font)] mt-2\">Timetable\u003c/h2>\n        \u003csvg class=\"mt-4 w-32 h-3 text-white/70\" viewBox=\"0 0 128 12\" fill=\"none\" aria-hidden=\"true\">\n          \u003cpath d=\"M1 7c8-6 16-6 24 0s16 6 24 0 16-6 24 0 16 6 24 0 16-6 24 0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n        \u003c/svg>\n        \u003cp class=\"sb-body mt-6 text-white/70 max-w-[40ch]\">Two classes a day, morning and evening. Sunday has one later morning class.\u003c/p>\n      \u003c/div>\n\n      \u003cdiv class=\"lg:col-span-8\">\n        \u003cdiv class=\"overflow-x-auto rounded-[var(--radius)] border border-white/20\" tabindex=\"0\" role=\"region\" aria-label=\"Weekly timetable, scrolls sideways on small screens\">\n          \u003ctable class=\"w-full min-w-[30rem] text-left border-collapse\">\n            \u003ccaption class=\"sb-small text-left px-4 py-3 text-white/70 border-b border-white/20\">Classes by day. Morning class at 7:00, evening class at 17:30.\u003c/caption>\n            \u003cthead>\n              \u003ctr class=\"border-b border-white/20\">\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">Day\u003c/th>\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">7:00\u003c/th>\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">17:30\u003c/th>\n              \u003c/tr>\n            \u003c/thead>\n            \u003ctbody class=\"sb-body\">\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Monday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Tuesday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Wednesday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Pranayama\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Thursday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Friday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Saturday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Beginners' series\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"bg-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Sunday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha \u003cspan class=\"sb-small text-white/70\">at 8:00\u003c/span>\u003c/td>\n                \u003ctd class=\"px-4 py-3 text-white/70\">No class\u003c/td>\n              \u003c/tr>\n            \u003c/tbody>\n          \u003c/table>\n        \u003c/div>\n        \u003cp class=\"sb-small mt-4 text-white/70 flex items-start gap-2\">\n          \u003csvg class=\"mt-1 h-3 w-3 shrink-0\" viewBox=\"0 0 12 12\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"6\" cy=\"6\" r=\"4.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          \u003cspan>Times can shift during the monsoon. Check before you come.\u003c/span>\n        \u003c/p>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":18655,"reason":"build","resolves":[],"chars":4274},{"t":95927,"type":"agent:start","id":"footer","agent":{"name":"Dennis","color":"#c2185b"},"reason":"build"},{"t":96912,"type":"agent:done","id":"hero","agent":{"name":"Linus","color":"#2e86ab"},"html":"\u003csection data-section=\"hero\" id=\"hero\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)] overflow-hidden\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[70vh]\">\n      \u003cdiv class=\"lg:col-span-7\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" class=\"text-[var(--accent)]\">\u003ccircle cx=\"6\" cy=\"6\" r=\"4.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          Assagao, North Goa\n        \u003c/p>\n        \u003ch1 class=\"sb-h1 font-[family-name:var(--heading-font)] mt-4 max-w-[14ch]\">Slow mornings, steady breath.\u003c/h1>\n        \u003csvg aria-hidden=\"true\" class=\"mt-6 w-40 h-3 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\">\u003cpath d=\"M1 7c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 38-1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\u003c/svg>\n        \u003cp class=\"sb-lead text-[var(--muted)] mt-6 max-w-[60ch]\">Small classes, open to beginners, held in a shaded studio in Assagao, a few minutes from the sea.\u003c/p>\n        \u003cdiv class=\"mt-8 flex flex-col sm:flex-row gap-3\">\n          \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px]\">Book a class\u003c/a>\n          \u003ca href=\"#timetable\" class=\"sb-btn sb-btn-ghost min-h-[44px]\">See timetable\u003c/a>\n        \u003c/div>\n        \u003cul class=\"mt-12 pt-6 border-t border-[var(--line)] grid grid-cols-1 sm:grid-cols-3 gap-4 sb-small text-[var(--ink)]\">\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Classes of 12 or fewer\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mats provided\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mornings and evenings\n          \u003c/li>\n        \u003c/ul>\n      \u003c/div>\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--line)] p-6 sm:p-8\">\n          \u003csvg aria-hidden=\"true\" viewBox=\"0 0 400 420\" class=\"w-full h-auto\" fill=\"none\">\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" fill=\"var(--accent-soft)\"/>\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" stroke=\"var(--muted)\" stroke-width=\"1.5\"/>\n            \u003cline x1=\"20\" y1=\"230\" x2=\"380\" y2=\"230\" stroke=\"var(--line)\" stroke-width=\"1.5\"/>\n            \u003crect x=\"0\" y=\"231\" width=\"400\" height=\"190\" fill=\"var(--surface)\"/>\n            \u003cpath d=\"M10 262c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--accent)\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 312c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--muted)\" stroke-width=\"1.75\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 362c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":25787,"reason":"build","resolves":[],"chars":3394},{"t":100454,"type":"agent:done","id":"classes","agent":{"name":"Grace","color":"#7b2cbf"},"html":"\u003csection data-section=\"classes\" id=\"classes\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16\">\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"lg:sticky lg:top-24\">\n          \u003cp class=\"sb-eyebrow text-[var(--muted)]\">Class styles\u003c/p>\n          \u003ch2 class=\"sb-h2 mt-4 font-[family-name:var(--heading-font)]\">Five ways to practise\u003c/h2>\n          \u003csvg class=\"mt-6 h-3 w-40 text-[var(--accent)]\" viewBox=\"0 0 160 12\" fill=\"none\" aria-hidden=\"true\">\n            \u003cpath d=\"M2 7c10-5 18-5 27 0s18 5 27 0 18-5 27 0 18 5 27 0 18-5 27 0 15 4 21 1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n          \u003cp class=\"sb-lead mt-6 max-w-[48ch] text-[var(--muted)]\">Every class can be adapted, so you can pick by mood, not by fitness.\u003c/p>\n          \u003ca href=\"#timetable\" class=\"mt-8 inline-flex min-h-[44px] items-center gap-2 font-medium text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]\">\n            See the timetable\n            \u003csvg class=\"h-4 w-4\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M5 12h14M13 6l6 6-6 6\"/>\u003c/svg>\n          \u003c/a>\n        \u003c/div>\n      \u003c/div>\n\n      \u003col class=\"lg:col-span-7 border-t border-[var(--line)]\">\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">01\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Hatha\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">Steady holds with time to find your alignment in each pose.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">75 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">02\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Vinyasa\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">A flowing sequence where each movement follows the breath.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">Some experience helps\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">60 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">03\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Yin\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">Long, quiet holds on the floor, a few minutes in each shape.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">75 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">04\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Pranayama\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">A seated breathing practice. No poses, just you and your breath.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">45 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">05\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 flex items-center gap-3 font-[family-name:var(--heading-font)]\">\n              Beginners' series\n              \u003csvg class=\"h-4 w-4 text-[var(--accent)]\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"8\" cy=\"8\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">The basics, step by step, if you have never done yoga before.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">New to yoga\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">4 classes over 2 weeks\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n      \u003c/ol>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":25376,"reason":"build","resolves":[],"chars":5902},{"t":107950,"type":"agent:done","id":"classes","agent":{"name":"Grace","color":"#7b2cbf"},"html":"\u003csection data-section=\"classes\" id=\"classes\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16\">\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"lg:sticky lg:top-24\">\n          \u003cp class=\"sb-eyebrow text-[var(--muted)]\">Class styles\u003c/p>\n          \u003ch2 class=\"sb-h2 mt-4 font-[family-name:var(--heading-font)]\">Five ways to practise\u003c/h2>\n          \u003csvg class=\"mt-6 h-3 w-40 text-[var(--accent)]\" viewBox=\"0 0 160 12\" fill=\"none\" aria-hidden=\"true\">\n            \u003cpath d=\"M2 7c10-5 18-5 27 0s18 5 27 0 18-5 27 0 18 5 27 0 18-5 27 0 15 4 21 1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n          \u003cp class=\"sb-lead mt-6 max-w-[48ch] text-[var(--muted)]\">Every class can be adapted, so you can pick by mood, not by fitness.\u003c/p>\n          \u003ca href=\"#timetable\" class=\"mt-8 inline-flex min-h-[44px] items-center gap-2 font-medium text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]\">\n            See the timetable\n            \u003csvg class=\"h-4 w-4\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M5 12h14M13 6l6 6-6 6\"/>\u003c/svg>\n          \u003c/a>\n        \u003c/div>\n      \u003c/div>\n\n      \u003col class=\"lg:col-span-7 border-t border-[var(--line)]\">\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">01\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Hatha\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">Steady holds with time to find your alignment in each pose.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">75 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">02\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Vinyasa\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">A flowing sequence where each movement follows the breath.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">Some experience helps\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">60 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">03\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Yin\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">Long, quiet holds on the floor, a few minutes in each shape.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">75 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">04\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Pranayama\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">A seated breathing practice. No poses, just you and your breath.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">45 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">05\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 flex items-center gap-3 font-[family-name:var(--heading-font)]\">\n              Beginners' series\n              \u003csvg class=\"h-4 w-4 text-[var(--accent)]\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"8\" cy=\"8\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">The basics, step by step, if you have never done yoga before.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">New to yoga\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">4 classes over 2 weeks\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n      \u003c/ol>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":32872,"reason":"build","resolves":[],"chars":5902},{"t":112398,"type":"agent:done","id":"footer","agent":{"name":"Dennis","color":"#c2185b"},"html":"\u003csection data-section=\"footer\" id=\"footer\" class=\"bg-[var(--surface)] text-[var(--ink)] pt-0 pb-8\">\n  \u003csvg class=\"block w-full h-4 text-[var(--line)]\" viewBox=\"0 0 1200 16\" preserveAspectRatio=\"none\" fill=\"none\" aria-hidden=\"true\">\n    \u003cpath d=\"M0 8 C 50 2, 100 2, 150 8 S 250 14, 300 8 S 400 2, 450 8 S 550 14, 600 8 S 700 2, 750 8 S 850 14, 900 8 S 1000 2, 1050 8 S 1150 14, 1200 8\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" vector-effect=\"non-scaling-stroke\"/>\n  \u003c/svg>\n  \u003cdiv class=\"sb-wrap pt-12\">\n    \u003ch2 class=\"sr-only\">Saltwater Yoga contact and links\u003c/h2>\n    \u003cdiv class=\"grid gap-8 md:grid-cols-3 md:gap-12\">\n      \u003cdiv>\n        \u003cp class=\"font-[family-name:var(--heading-font)] text-2xl text-[var(--ink)]\">Saltwater Yoga\u003c/p>\n        \u003cp class=\"sb-small mt-2 text-[var(--muted)] max-w-[32ch]\">Small yoga classes in Assagao, North Goa.\u003c/p>\n      \u003c/div>\n      \u003cdiv>\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg class=\"w-2.5 h-2.5 text-[var(--accent)]\" viewBox=\"0 0 10 10\" aria-hidden=\"true\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          Find us\n        \u003c/p>\n        \u003caddress class=\"sb-small mt-3 not-italic text-[var(--ink)]\">Studio address, Assagao, Goa 403507\u003c/address>\n        \u003cp class=\"sb-small mt-2 text-[var(--muted)]\">Open Mon-Sat 6:30-19:00, Sun 7:30-10:00\u003c/p>\n      \u003c/div>\n      \u003cnav aria-label=\"Footer\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg class=\"w-2.5 h-2.5 text-[var(--accent)]\" viewBox=\"0 0 10 10\" aria-hidden=\"true\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          On this page\n        \u003c/p>\n        \u003cul class=\"mt-1 flex flex-col\">\n          \u003cli>\u003ca href=\"#classes\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Classes\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#timetable\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Timetable\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Visit\u003c/a>\u003c/li>\n        \u003c/ul>\n      \u003c/nav>\n    \u003c/div>\n    \u003cdiv class=\"mt-10 border-t border-[var(--line)] pt-6\">\n      \u003cp class=\"sb-small text-[var(--muted)]\">© 2026 Saltwater Yoga. This is a sample page.\u003c/p>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":16471,"reason":"build","resolves":[],"chars":3007},{"t":120438,"type":"agent:done","id":"footer","agent":{"name":"Dennis","color":"#c2185b"},"html":"\u003csection data-section=\"footer\" id=\"footer\" class=\"bg-[var(--surface)] text-[var(--ink)] pt-0 pb-8\">\n  \u003csvg class=\"block w-full h-4 text-[var(--line)]\" viewBox=\"0 0 1200 16\" preserveAspectRatio=\"none\" fill=\"none\" aria-hidden=\"true\">\n    \u003cpath d=\"M0 8 C 50 2, 100 2, 150 8 S 250 14, 300 8 S 400 2, 450 8 S 550 14, 600 8 S 700 2, 750 8 S 850 14, 900 8 S 1000 2, 1050 8 S 1150 14, 1200 8\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" vector-effect=\"non-scaling-stroke\"/>\n  \u003c/svg>\n  \u003cdiv class=\"sb-wrap pt-12\">\n    \u003ch2 class=\"sr-only\">Saltwater Yoga contact and links\u003c/h2>\n    \u003cdiv class=\"grid gap-8 md:grid-cols-3 md:gap-12\">\n      \u003cdiv>\n        \u003cp class=\"font-[family-name:var(--heading-font)] text-2xl text-[var(--ink)]\">Saltwater Yoga\u003c/p>\n        \u003cp class=\"sb-small mt-2 text-[var(--muted)] max-w-[32ch]\">Small yoga classes in Assagao, North Goa.\u003c/p>\n      \u003c/div>\n      \u003cdiv>\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg class=\"w-2.5 h-2.5 text-[var(--accent)]\" viewBox=\"0 0 10 10\" aria-hidden=\"true\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          Find us\n        \u003c/p>\n        \u003caddress class=\"sb-small mt-3 not-italic text-[var(--ink)]\">Studio address, Assagao, Goa 403507\u003c/address>\n        \u003cp class=\"sb-small mt-2 text-[var(--muted)]\">Open Mon-Sat 6:30-19:00, Sun 7:30-10:00\u003c/p>\n      \u003c/div>\n      \u003cnav aria-label=\"Footer\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg class=\"w-2.5 h-2.5 text-[var(--accent)]\" viewBox=\"0 0 10 10\" aria-hidden=\"true\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          On this page\n        \u003c/p>\n        \u003cul class=\"mt-1 flex flex-col\">\n          \u003cli>\u003ca href=\"#classes\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Classes\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#timetable\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Timetable\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Visit\u003c/a>\u003c/li>\n        \u003c/ul>\n      \u003c/nav>\n    \u003c/div>\n    \u003cdiv class=\"mt-10 border-t border-[var(--line)] pt-6\">\n      \u003cp class=\"sb-small text-[var(--muted)]\">© 2026 Saltwater Yoga. This is a sample page.\u003c/p>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":24510,"reason":"build","resolves":[],"chars":3007},{"t":124066,"type":"agent:done","id":"visit","agent":{"name":"Margaret","color":"#d4a017"},"html":"\u003csection data-section=\"visit\" id=\"visit\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16\">\n      \u003cdiv class=\"lg:col-span-6\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)]\">First visit\u003c/p>\n        \u003ch2 class=\"sb-h2 mt-2 font-[family-name:var(--heading-font)]\">Your first class\u003c/h2>\n        \u003csvg class=\"mt-4 h-3 w-40 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\" aria-hidden=\"true\">\n          \u003cpath d=\"M1 6c10-5 20-5 30 0s20 5 30 0 20-5 30 0 20 5 30 0 20-5 38 0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n        \u003c/svg>\n        \u003cul class=\"mt-8 space-y-4 max-w-[60ch]\">\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Arrive 10 minutes early so you can settle in.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Wear clothes you can move in.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Mats and blocks are provided.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Bring water.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>No experience needed.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Tell the teacher about any injuries before class starts.\u003c/span>\n          \u003c/li>\n        \u003c/ul>\n        \u003cdiv class=\"mt-10 border-t border-[var(--line)] pt-6 max-w-[60ch]\">\n          \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">The teachers\u003c/h3>\n          \u003cp class=\"sb-body mt-2 text-[var(--muted)]\">Classes are led by the studio's resident teachers, who keep groups small.\u003c/p>\n        \u003c/div>\n      \u003c/div>\n\n      \u003cdiv class=\"lg:col-span-6\">\n        \u003cdiv class=\"sb-card bg-[var(--card)] border border-[var(--line)] rounded-[var(--radius)] p-6 sm:p-8\">\n          \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Request a spot\u003c/h3>\n          \u003cp class=\"sb-small mt-2 text-[var(--muted)]\">Pick a class and a day. We'll confirm the time with you.\u003c/p>\n          \u003cform class=\"mt-6 space-y-5\">\n            \u003cdiv>\n              \u003clabel for=\"visit-name\" class=\"sb-small block font-medium text-[var(--ink)]\">Name\u003c/label>\n              \u003cinput id=\"visit-name\" name=\"name\" type=\"text\" autocomplete=\"name\" required class=\"sb-input mt-2 w-full\">\n            \u003c/div>\n            \u003cdiv>\n              \u003clabel for=\"visit-phone\" class=\"sb-small block font-medium text-[var(--ink)]\">Phone\u003c/label>\n              \u003cinput id=\"visit-phone\" name=\"phone\" type=\"tel\" autocomplete=\"tel\" inputmode=\"tel\" required class=\"sb-input mt-2 w-full\">\n            \u003c/div>\n            \u003cdiv class=\"grid grid-cols-1 gap-5 sm:grid-cols-2\">\n              \u003cdiv>\n                \u003clabel for=\"visit-class\" class=\"sb-small block font-medium text-[var(--ink)]\">Class\u003c/label>\n                \u003cselect id=\"visit-class\" name=\"class\" class=\"sb-input mt-2 w-full\">\n                  \u003coption>Hatha\u003c/option>\n                  \u003coption>Vinyasa\u003c/option>\n                  \u003coption>Yin\u003c/option>\n                  \u003coption>Pranayama\u003c/option>\n                  \u003coption>Beginners' series\u003c/option>\n                \u003c/select>\n              \u003c/div>\n              \u003cdiv>\n                \u003clabel for=\"visit-day\" class=\"sb-small block font-medium text-[var(--ink)]\">Preferred day\u003c/label>\n                \u003cselect id=\"visit-day\" name=\"day\" class=\"sb-input mt-2 w-full\">\n                  \u003coption>Monday\u003c/option>\n                  \u003coption>Tuesday\u003c/option>\n                  \u003coption>Wednesday\u003c/option>\n                  \u003coption>Thursday\u003c/option>\n                  \u003coption>Friday\u003c/option>\n                  \u003coption>Saturday\u003c/option>\n                  \u003coption>Sunday\u003c/option>\n                \u003c/select>\n              \u003c/div>\n            \u003c/div>\n            \u003cbutton type=\"button\" class=\"sb-btn sb-btn-primary w-full min-h-[44px]\">Request a spot\u003c/button>\n            \u003cp class=\"sb-small text-[var(--muted)]\">We reply on WhatsApp within a day.\u003c/p>\n          \u003c/form>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":43259,"reason":"build","resolves":[],"chars":5346},{"t":172550,"type":"review:done","findings":[{"source":"impeccable","severity":"warning","message":"Low contrast text: 1.9:1 (need 4.5:1) — text #0e6e6a on #12403f","rule":"low-contrast"},{"source":"impeccable","severity":"warning","message":"Hero eyebrow / pill chip: eyebrow chip (tracked-caps) \"Assagao, North Goa\" above h1 \"Slow mornings, steady breath.\"","rule":"hero-eyebrow-chip"},{"source":"impeccable","severity":"warning","message":"Cramped padding: \u003csection> \"sb-section\": children flush against bg on all sides (no inset)","rule":"cramped-padding"},{"source":"impeccable","severity":"warning","message":"Cramped padding: \u003cdiv> \"sb-card\": children flush against border+bg on all sides (no inset)","rule":"cramped-padding"},{"source":"impeccable","severity":"warning","message":"Cream / beige palette: cream/beige page background rgb(246, 241, 231)","rule":"cream-palette"}],"fixes":[],"summary":"5 automated findings."},{"t":222496,"type":"agent:done","id":"timetable","agent":{"name":"Alan","color":"#2a9d8f"},"html":"\u003csection data-section=\"timetable\" id=\"timetable\" class=\"sb-section sb-dark bg-[var(--dark)] text-[var(--dark-ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid gap-8 lg:grid-cols-12 lg:gap-12\">\n      \u003cdiv class=\"lg:col-span-4\">\n        \u003cp class=\"sb-eyebrow text-white/70\">This week\u003c/p>\n        \u003ch2 class=\"sb-h2 font-[family-name:var(--heading-font)] mt-2\">Timetable\u003c/h2>\n        \u003csvg class=\"mt-4 w-32 h-3 text-white/70\" viewBox=\"0 0 128 12\" fill=\"none\" aria-hidden=\"true\">\n          \u003cpath d=\"M1 7c8-6 16-6 24 0s16 6 24 0 16-6 24 0 16 6 24 0 16-6 24 0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n        \u003c/svg>\n        \u003cp class=\"sb-body mt-6 text-white/70 max-w-[40ch]\">Two classes a day, morning and evening. Sunday has one later morning class.\u003c/p>\n      \u003c/div>\n\n      \u003cdiv class=\"lg:col-span-8\">\n        \u003cdiv class=\"overflow-x-auto rounded-[var(--radius)] border border-white/20\" tabindex=\"0\" role=\"region\" aria-label=\"Weekly timetable, scrolls sideways on small screens\">\n          \u003ctable class=\"w-full min-w-[30rem] text-left border-collapse\">\n            \u003ccaption class=\"sb-small text-left px-4 py-3 text-white/70 border-b border-white/20\">Classes by day. Morning class at 7:00, evening class at 17:30.\u003c/caption>\n            \u003cthead>\n              \u003ctr class=\"border-b border-white/20\">\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">Day\u003c/th>\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">7:00\u003c/th>\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">17:30\u003c/th>\n              \u003c/tr>\n            \u003c/thead>\n            \u003ctbody class=\"sb-body\">\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Monday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Tuesday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Wednesday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Pranayama\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Thursday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Friday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Saturday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Beginners' series\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"bg-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Sunday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha \u003cspan class=\"sb-small text-white/70\">at 8:00\u003c/span>\u003c/td>\n                \u003ctd class=\"px-4 py-3 text-white/70\">No class\u003c/td>\n              \u003c/tr>\n            \u003c/tbody>\n          \u003c/table>\n        \u003c/div>\n        \u003cp class=\"sb-small mt-4 text-white/70 flex items-start gap-2\">\n          \u003csvg class=\"mt-1 h-3 w-3 shrink-0\" viewBox=\"0 0 12 12\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"6\" cy=\"6\" r=\"4.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          \u003cspan>Times can shift during the monsoon. Check before you come.\u003c/span>\n        \u003c/p>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":145904,"reason":"build","resolves":[],"chars":4274},{"t":228216,"type":"review:done","findings":[{"source":"impeccable","severity":"warning","message":"Hero eyebrow / pill chip: eyebrow chip (tracked-caps) \"Assagao, North Goa\" above h1 \"Slow mornings, steady breath.\"","rule":"hero-eyebrow-chip"},{"source":"impeccable","severity":"warning","message":"Kicker / eyebrow label above heading: kicker \"Class styles\" above h2 \"Five ways to practise\"","rule":"kicker-above-heading"},{"source":"impeccable","severity":"warning","message":"Kicker / eyebrow label above heading: kicker \"This week\" above h2 \"Timetable\"","rule":"kicker-above-heading"},{"source":"impeccable","severity":"warning","message":"Kicker / eyebrow label above heading: kicker \"First visit\" above h2 \"Your first class\"","rule":"kicker-above-heading"},{"source":"impeccable","severity":"warning","message":"Cream / beige palette: cream/beige page background rgb(246, 241, 231)","rule":"cream-palette"}],"fixes":[],"summary":"5 automated findings."},{"t":369742,"type":"agent:done","id":"hero","agent":{"name":"Linus","color":"#2e86ab"},"html":"\u003csection data-section=\"hero\" id=\"hero\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)] overflow-hidden\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[560px]\">\n      \u003cdiv class=\"lg:col-span-7\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg aria-hidden=\"true\" width=\"12\" height=\"12\" viewBox=\"0 0 12 12\" class=\"text-[var(--accent)]\">\u003ccircle cx=\"6\" cy=\"6\" r=\"4.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          Assagao, North Goa\n        \u003c/p>\n        \u003ch1 class=\"sb-h1 font-[family-name:var(--heading-font)] mt-4 max-w-[14ch]\">Slow mornings, steady breath.\u003c/h1>\n        \u003csvg aria-hidden=\"true\" class=\"mt-6 w-40 h-3 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\">\u003cpath d=\"M1 7c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 38-1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\u003c/svg>\n        \u003cp class=\"sb-lead text-[var(--muted)] mt-6 max-w-[60ch]\">Small classes, open to beginners, held in a shaded studio in Assagao, a few minutes from the sea.\u003c/p>\n        \u003cdiv class=\"mt-8 flex flex-col sm:flex-row gap-3\">\n          \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px]\">Book a class\u003c/a>\n          \u003ca href=\"#timetable\" class=\"sb-btn sb-btn-ghost min-h-[44px]\">See timetable\u003c/a>\n        \u003c/div>\n        \u003cul class=\"mt-12 pt-6 border-t border-[var(--line)] grid grid-cols-1 sm:grid-cols-3 gap-4 sb-small text-[var(--ink)]\">\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Classes of 12 or fewer\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mats provided\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mornings and evenings\n          \u003c/li>\n        \u003c/ul>\n      \u003c/div>\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--line)] p-6 sm:p-8\">\n          \u003csvg aria-hidden=\"true\" viewBox=\"0 0 400 420\" class=\"w-full h-auto\" fill=\"none\">\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" fill=\"var(--accent-soft)\"/>\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" stroke=\"var(--muted)\" stroke-width=\"1.5\"/>\n            \u003cline x1=\"20\" y1=\"230\" x2=\"380\" y2=\"230\" stroke=\"var(--line)\" stroke-width=\"1.5\"/>\n            \u003crect x=\"0\" y=\"231\" width=\"400\" height=\"190\" fill=\"var(--surface)\"/>\n            \u003cpath d=\"M10 262c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--accent)\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 312c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--muted)\" stroke-width=\"1.75\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 362c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":298617,"reason":"build","resolves":[],"chars":3394},{"t":397840,"type":"comment:add","comment":{"id":"c1","section":"hero","target":"\u003cp> \"Assagao, North Goa\"","path":":scope > div > div > div:nth-of-type(1) > p:nth-of-type(1)","text":"Remove this small label. Let the headline stand on its own and give it a bit more room above.","status":"open","at":1794678291229}},{"t":429057,"type":"agent:start","id":"hero","agent":{"name":"Linus","color":"#2e86ab"},"reason":"comment","note":"Remove this small label. Let the headline stand on its own and give it a bit more room above."},{"t":450987,"type":"agent:done","id":"hero","agent":{"name":"Linus","color":"#2e86ab"},"html":"\u003csection data-section=\"hero\" id=\"hero\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)] overflow-hidden\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[560px]\">\n      \u003cdiv class=\"lg:col-span-7 pt-8 lg:pt-12\">\n        \u003ch1 class=\"sb-h1 font-[family-name:var(--heading-font)] max-w-[14ch]\">Slow mornings, steady breath.\u003c/h1>\n        \u003csvg aria-hidden=\"true\" class=\"mt-6 w-40 h-3 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\">\u003cpath d=\"M1 7c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 38-1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\u003c/svg>\n        \u003cp class=\"sb-lead text-[var(--muted)] mt-6 max-w-[60ch]\">Small classes, open to beginners, held in a shaded studio in Assagao, a few minutes from the sea.\u003c/p>\n        \u003cdiv class=\"mt-8 flex flex-col sm:flex-row gap-3\">\n          \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px]\">Book a class\u003c/a>\n          \u003ca href=\"#timetable\" class=\"sb-btn sb-btn-ghost min-h-[44px]\">See timetable\u003c/a>\n        \u003c/div>\n        \u003cul class=\"mt-12 pt-6 border-t border-[var(--line)] grid grid-cols-1 sm:grid-cols-3 gap-4 sb-small text-[var(--ink)]\">\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Classes of 12 or fewer\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mats provided\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mornings and evenings\n          \u003c/li>\n        \u003c/ul>\n      \u003c/div>\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--line)] p-6 sm:p-8\">\n          \u003csvg aria-hidden=\"true\" viewBox=\"0 0 400 420\" class=\"w-full h-auto\" fill=\"none\">\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" fill=\"var(--accent-soft)\"/>\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" stroke=\"var(--muted)\" stroke-width=\"1.5\"/>\n            \u003cline x1=\"20\" y1=\"230\" x2=\"380\" y2=\"230\" stroke=\"var(--line)\" stroke-width=\"1.5\"/>\n            \u003crect x=\"0\" y=\"231\" width=\"400\" height=\"190\" fill=\"var(--surface)\"/>\n            \u003cpath d=\"M10 262c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--accent)\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 312c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--muted)\" stroke-width=\"1.75\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 362c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>","ms":21928,"reason":"comment","resolves":["c1"],"chars":3090},{"t":475773,"type":"done","stats":{"wallMs":450987,"planMs":49711,"buildWallMs":54176,"sumMs":134396,"speedup":2.48,"sections":6,"built":6,"failed":0,"tokens":null,"costUsd":null,"outDir":"/Users/pp/Documents/GitHub/swarm-build/out/agent-demo/.swarm/landing-page-for-saltwater-yoga-a-small--20261114173813","page":"/Users/pp/Documents/GitHub/swarm-build/out/agent-demo/.swarm/landing-page-for-saltwater-yoga-a-small--20261114173813/index.html","model":null}}],"page":"\u003c!doctype html>\n\u003chtml lang=\"en\">\n\u003chead>\n\u003cmeta charset=\"utf-8\">\n\u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\u003ctitle>Saltwater Yoga, Assagao\u003c/title>\n\u003cmeta name=\"description\" content=\"A small yoga studio in Assagao, North Goa: slow morning and evening classes, a weekly timetable and easy first-visit booking.\">\n\u003clink rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n\u003clink rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\u003clink rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Young+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap\">\n\u003cscript src=\"https://cdn.tailwindcss.com\">\u003c/script>\n\u003cstyle>:root{--bg:#f6f1e7;--surface:#ece3d2;--card:#fffdf8;--ink:#1d2b2a;--muted:#52605e;--accent:#0e6e6a;--accent-ink:#ffffff;--accent-soft:#d6ebe6;--dark:#12403f;--dark-ink:#f4efe4;--line:#ddd3c1;--radius:18px;--font:'Figtree',system-ui,sans-serif;--heading-font:'Young Serif','Figtree',serif;--h1:76px;--h2:46px;--h3:22px;--body:17px;--small:14px;--section-y:112px;--max-w:70rem}\nhtml{scroll-behavior:smooth}\nbody{font-family:var(--font);font-size:var(--body);line-height:1.6;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}\n.sb-wrap{max-width:var(--max-w);margin-inline:auto;padding-inline:24px}\n.sb-section{padding-block:clamp(56px,9vw,var(--section-y))}\n.sb-h1{font-family:var(--heading-font);font-size:clamp(calc(var(--h1)*.62),6.2vw,var(--h1));line-height:1.04;letter-spacing:-.02em;font-weight:600;text-wrap:balance}\n.sb-h2{font-family:var(--heading-font);font-size:clamp(calc(var(--h2)*.7),4.4vw,var(--h2));line-height:1.12;letter-spacing:-.015em;font-weight:600;text-wrap:balance}\n.sb-h3{font-family:var(--heading-font);font-size:var(--h3);line-height:1.3;font-weight:600}\n.sb-lead{font-size:calc(var(--body)*1.18);line-height:1.55;color:var(--muted);text-wrap:pretty}\n.sb-body{font-size:var(--body);line-height:1.6;color:var(--muted)}\n.sb-small{font-size:var(--small);line-height:1.5;color:var(--muted)}\n.sb-eyebrow{font-size:var(--small);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}\n.sb-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.7rem 1.25rem;border-radius:calc(var(--radius)*.75);font-weight:600;font-size:var(--small);line-height:1;transition:transform .15s,background-color .15s,border-color .15s;cursor:pointer;text-decoration:none}\n.sb-btn:hover{transform:translateY(-1px)}\n.sb-btn:focus-visible,.sb-card a:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}\n.sb-btn-primary{background:var(--accent);color:var(--accent-ink)}\n.sb-btn-primary:hover{background:color-mix(in srgb,var(--accent) 88%,#000)}\n.sb-btn-ghost{border:1px solid var(--line);color:var(--ink);background:transparent}\n.sb-btn-ghost:hover{border-color:var(--ink)}\n.sb-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}\n.sb-dark{background:var(--dark);color:var(--dark-ink)}\n.sb-dark .sb-body,.sb-dark .sb-lead,.sb-dark .sb-small{color:color-mix(in srgb,var(--dark-ink) 78%,transparent)}\n.sb-dark .sb-eyebrow{color:color-mix(in srgb,var(--dark-ink) 72%,var(--accent-soft))}\n.sb-dark .sb-btn-ghost{border-color:color-mix(in srgb,var(--dark-ink) 35%,transparent);color:var(--dark-ink)}\n.sb-dark .sb-card{background:color-mix(in srgb,var(--dark-ink) 6%,var(--dark));border-color:color-mix(in srgb,var(--dark-ink) 18%,transparent);color:var(--dark-ink)}\n.sb-input{width:100%;min-height:44px;padding:.65rem .85rem;border:1px solid var(--line);border-radius:calc(var(--radius)*.6);background:var(--card);color:var(--ink);font-size:var(--small)}\n@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}\u003c/style>\n\u003c/head>\n\u003cbody>\n\u003csection data-section=\"header\" id=\"header\" class=\"bg-[var(--bg)] border-b border-[var(--line)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cheader class=\"flex items-center justify-between gap-4 py-4\">\n      \u003ca href=\"#hero\" class=\"flex items-center gap-2 text-[var(--ink)] rounded-[var(--radius)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]\" aria-label=\"Saltwater Yoga, home\">\n        \u003csvg class=\"h-6 w-6 shrink-0 text-[var(--accent)]\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" aria-hidden=\"true\">\n          \u003ccircle cx=\"12\" cy=\"10\" r=\"4.5\"/>\n          \u003cpath d=\"M3 19c2-1.5 4-1.5 6 0s4 1.5 6 0 4-1.5 6 0\"/>\n        \u003c/svg>\n        \u003cspan class=\"font-[family-name:var(--heading-font)] text-xl sm:text-2xl leading-none tracking-tight whitespace-nowrap\">Saltwater Yoga\u003c/span>\n      \u003c/a>\n      \u003cnav aria-label=\"Main\" class=\"hidden md:block\">\n        \u003cul class=\"flex items-center gap-8 sb-small\">\n          \u003cli>\u003ca href=\"#classes\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Classes\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Teachers\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#timetable\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Timetable\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"text-[var(--ink)] underline-offset-8 decoration-[var(--accent)] hover:underline focus-visible:underline focus-visible:outline-none\">Visit\u003c/a>\u003c/li>\n        \u003c/ul>\n      \u003c/nav>\n      \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px] shrink-0 whitespace-nowrap\">Book a class\u003c/a>\n    \u003c/header>\n  \u003c/div>\n\u003c/section>\n\u003csection data-section=\"hero\" id=\"hero\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)] overflow-hidden\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center min-h-[560px]\">\n      \u003cdiv class=\"lg:col-span-7 pt-8 lg:pt-12\">\n        \u003ch1 class=\"sb-h1 font-[family-name:var(--heading-font)] max-w-[14ch]\">Slow mornings, steady breath.\u003c/h1>\n        \u003csvg aria-hidden=\"true\" class=\"mt-6 w-40 h-3 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\">\u003cpath d=\"M1 7c10-6 20-6 30 0s20 6 30 0 20-6 30 0 20 6 30 0 20-6 38-1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\u003c/svg>\n        \u003cp class=\"sb-lead text-[var(--muted)] mt-6 max-w-[60ch]\">Small classes, open to beginners, held in a shaded studio in Assagao, a few minutes from the sea.\u003c/p>\n        \u003cdiv class=\"mt-8 flex flex-col sm:flex-row gap-3\">\n          \u003ca href=\"#visit\" class=\"sb-btn sb-btn-primary min-h-[44px]\">Book a class\u003c/a>\n          \u003ca href=\"#timetable\" class=\"sb-btn sb-btn-ghost min-h-[44px]\">See timetable\u003c/a>\n        \u003c/div>\n        \u003cul class=\"mt-12 pt-6 border-t border-[var(--line)] grid grid-cols-1 sm:grid-cols-3 gap-4 sb-small text-[var(--ink)]\">\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Classes of 12 or fewer\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mats provided\n          \u003c/li>\n          \u003cli class=\"flex items-center gap-2\">\n            \u003csvg aria-hidden=\"true\" width=\"10\" height=\"10\" viewBox=\"0 0 10 10\" class=\"shrink-0 text-[var(--muted)]\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"currentColor\"/>\u003c/svg>\n            Mornings and evenings\n          \u003c/li>\n        \u003c/ul>\n      \u003c/div>\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"bg-[var(--surface)] rounded-[var(--radius)] border border-[var(--line)] p-6 sm:p-8\">\n          \u003csvg aria-hidden=\"true\" viewBox=\"0 0 400 420\" class=\"w-full h-auto\" fill=\"none\">\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" fill=\"var(--accent-soft)\"/>\n            \u003ccircle cx=\"200\" cy=\"170\" r=\"70\" stroke=\"var(--muted)\" stroke-width=\"1.5\"/>\n            \u003cline x1=\"20\" y1=\"230\" x2=\"380\" y2=\"230\" stroke=\"var(--line)\" stroke-width=\"1.5\"/>\n            \u003crect x=\"0\" y=\"231\" width=\"400\" height=\"190\" fill=\"var(--surface)\"/>\n            \u003cpath d=\"M10 262c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--accent)\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 312c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--muted)\" stroke-width=\"1.75\" stroke-linecap=\"round\"/>\n            \u003cpath d=\"M10 362c30-14 60-14 90 0s60 14 90 0 60-14 90 0 60 14 100 0\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>\n\u003csection data-section=\"classes\" id=\"classes\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16\">\n      \u003cdiv class=\"lg:col-span-5\">\n        \u003cdiv class=\"lg:sticky lg:top-24\">\n          \u003cp class=\"sb-eyebrow text-[var(--muted)]\">Class styles\u003c/p>\n          \u003ch2 class=\"sb-h2 mt-4 font-[family-name:var(--heading-font)]\">Five ways to practise\u003c/h2>\n          \u003csvg class=\"mt-6 h-3 w-40 text-[var(--accent)]\" viewBox=\"0 0 160 12\" fill=\"none\" aria-hidden=\"true\">\n            \u003cpath d=\"M2 7c10-5 18-5 27 0s18 5 27 0 18-5 27 0 18 5 27 0 18-5 27 0 15 4 21 1\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n          \u003c/svg>\n          \u003cp class=\"sb-lead mt-6 max-w-[48ch] text-[var(--muted)]\">Every class can be adapted, so you can pick by mood, not by fitness.\u003c/p>\n          \u003ca href=\"#timetable\" class=\"mt-8 inline-flex min-h-[44px] items-center gap-2 font-medium text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4 hover:text-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent)]\">\n            See the timetable\n            \u003csvg class=\"h-4 w-4\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M5 12h14M13 6l6 6-6 6\"/>\u003c/svg>\n          \u003c/a>\n        \u003c/div>\n      \u003c/div>\n\n      \u003col class=\"lg:col-span-7 border-t border-[var(--line)]\">\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">01\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Hatha\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">Steady holds with time to find your alignment in each pose.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">75 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">02\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Vinyasa\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">A flowing sequence where each movement follows the breath.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">Some experience helps\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">60 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">03\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Yin\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">Long, quiet holds on the floor, a few minutes in each shape.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">75 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">04\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Pranayama\u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">A seated breathing practice. No poses, just you and your breath.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">All levels\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">45 min\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n        \u003cli class=\"grid grid-cols-[auto_1fr] gap-x-5 border-b border-[var(--line)] py-8 sm:gap-x-8\">\n          \u003cspan class=\"pt-1 font-[family-name:var(--heading-font)] text-lg text-[var(--muted)]\">05\u003c/span>\n          \u003cdiv>\n            \u003ch3 class=\"sb-h3 flex items-center gap-3 font-[family-name:var(--heading-font)]\">\n              Beginners' series\n              \u003csvg class=\"h-4 w-4 text-[var(--accent)]\" viewBox=\"0 0 16 16\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"8\" cy=\"8\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003c/h3>\n            \u003cp class=\"sb-body mt-2 max-w-[60ch] text-[var(--muted)]\">The basics, step by step, if you have never done yoga before.\u003c/p>\n            \u003cul class=\"mt-4 flex flex-wrap gap-2\" aria-label=\"Level and length\">\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">New to yoga\u003c/li>\n              \u003cli class=\"sb-small rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1\">4 classes over 2 weeks\u003c/li>\n            \u003c/ul>\n          \u003c/div>\n        \u003c/li>\n      \u003c/ol>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>\n\u003csection data-section=\"timetable\" id=\"timetable\" class=\"sb-section sb-dark bg-[var(--dark)] text-[var(--dark-ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid gap-8 lg:grid-cols-12 lg:gap-12\">\n      \u003cdiv class=\"lg:col-span-4\">\n        \u003cp class=\"sb-eyebrow text-white/70\">This week\u003c/p>\n        \u003ch2 class=\"sb-h2 font-[family-name:var(--heading-font)] mt-2\">Timetable\u003c/h2>\n        \u003csvg class=\"mt-4 w-32 h-3 text-white/70\" viewBox=\"0 0 128 12\" fill=\"none\" aria-hidden=\"true\">\n          \u003cpath d=\"M1 7c8-6 16-6 24 0s16 6 24 0 16-6 24 0 16 6 24 0 16-6 24 0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n        \u003c/svg>\n        \u003cp class=\"sb-body mt-6 text-white/70 max-w-[40ch]\">Two classes a day, morning and evening. Sunday has one later morning class.\u003c/p>\n      \u003c/div>\n\n      \u003cdiv class=\"lg:col-span-8\">\n        \u003cdiv class=\"overflow-x-auto rounded-[var(--radius)] border border-white/20\" tabindex=\"0\" role=\"region\" aria-label=\"Weekly timetable, scrolls sideways on small screens\">\n          \u003ctable class=\"w-full min-w-[30rem] text-left border-collapse\">\n            \u003ccaption class=\"sb-small text-left px-4 py-3 text-white/70 border-b border-white/20\">Classes by day. Morning class at 7:00, evening class at 17:30.\u003c/caption>\n            \u003cthead>\n              \u003ctr class=\"border-b border-white/20\">\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">Day\u003c/th>\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">7:00\u003c/th>\n                \u003cth scope=\"col\" class=\"sb-small font-semibold uppercase tracking-wider px-4 py-3 text-white/70\">17:30\u003c/th>\n              \u003c/tr>\n            \u003c/thead>\n            \u003ctbody class=\"sb-body\">\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Monday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Tuesday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Wednesday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Pranayama\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Thursday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Friday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Vinyasa\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"border-b border-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Saturday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Beginners' series\u003c/td>\n                \u003ctd class=\"px-4 py-3\">Yin\u003c/td>\n              \u003c/tr>\n              \u003ctr class=\"bg-white/10\">\n                \u003cth scope=\"row\" class=\"px-4 py-3 font-semibold font-[family-name:var(--heading-font)]\">Sunday\u003c/th>\n                \u003ctd class=\"px-4 py-3\">Hatha \u003cspan class=\"sb-small text-white/70\">at 8:00\u003c/span>\u003c/td>\n                \u003ctd class=\"px-4 py-3 text-white/70\">No class\u003c/td>\n              \u003c/tr>\n            \u003c/tbody>\n          \u003c/table>\n        \u003c/div>\n        \u003cp class=\"sb-small mt-4 text-white/70 flex items-start gap-2\">\n          \u003csvg class=\"mt-1 h-3 w-3 shrink-0\" viewBox=\"0 0 12 12\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"6\" cy=\"6\" r=\"4.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          \u003cspan>Times can shift during the monsoon. Check before you come.\u003c/span>\n        \u003c/p>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>\n\u003csection data-section=\"visit\" id=\"visit\" class=\"sb-section bg-[var(--bg)] text-[var(--ink)]\">\n  \u003cdiv class=\"sb-wrap\">\n    \u003cdiv class=\"grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16\">\n      \u003cdiv class=\"lg:col-span-6\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)]\">First visit\u003c/p>\n        \u003ch2 class=\"sb-h2 mt-2 font-[family-name:var(--heading-font)]\">Your first class\u003c/h2>\n        \u003csvg class=\"mt-4 h-3 w-40 text-[var(--line)]\" viewBox=\"0 0 160 12\" fill=\"none\" aria-hidden=\"true\">\n          \u003cpath d=\"M1 6c10-5 20-5 30 0s20 5 30 0 20-5 30 0 20 5 30 0 20-5 38 0\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n        \u003c/svg>\n        \u003cul class=\"mt-8 space-y-4 max-w-[60ch]\">\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Arrive 10 minutes early so you can settle in.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Wear clothes you can move in.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Mats and blocks are provided.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Bring water.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>No experience needed.\u003c/span>\n          \u003c/li>\n          \u003cli class=\"flex items-start gap-4 sb-body\">\n            \u003csvg class=\"mt-1.5 h-3.5 w-3.5 shrink-0 text-[var(--muted)]\" viewBox=\"0 0 14 14\" fill=\"none\" aria-hidden=\"true\">\u003ccircle cx=\"7\" cy=\"7\" r=\"5.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n            \u003cspan>Tell the teacher about any injuries before class starts.\u003c/span>\n          \u003c/li>\n        \u003c/ul>\n        \u003cdiv class=\"mt-10 border-t border-[var(--line)] pt-6 max-w-[60ch]\">\n          \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">The teachers\u003c/h3>\n          \u003cp class=\"sb-body mt-2 text-[var(--muted)]\">Classes are led by the studio's resident teachers, who keep groups small.\u003c/p>\n        \u003c/div>\n      \u003c/div>\n\n      \u003cdiv class=\"lg:col-span-6\">\n        \u003cdiv class=\"sb-card bg-[var(--card)] border border-[var(--line)] rounded-[var(--radius)] p-6 sm:p-8\">\n          \u003ch3 class=\"sb-h3 font-[family-name:var(--heading-font)]\">Request a spot\u003c/h3>\n          \u003cp class=\"sb-small mt-2 text-[var(--muted)]\">Pick a class and a day. We'll confirm the time with you.\u003c/p>\n          \u003cform class=\"mt-6 space-y-5\">\n            \u003cdiv>\n              \u003clabel for=\"visit-name\" class=\"sb-small block font-medium text-[var(--ink)]\">Name\u003c/label>\n              \u003cinput id=\"visit-name\" name=\"name\" type=\"text\" autocomplete=\"name\" required class=\"sb-input mt-2 w-full\">\n            \u003c/div>\n            \u003cdiv>\n              \u003clabel for=\"visit-phone\" class=\"sb-small block font-medium text-[var(--ink)]\">Phone\u003c/label>\n              \u003cinput id=\"visit-phone\" name=\"phone\" type=\"tel\" autocomplete=\"tel\" inputmode=\"tel\" required class=\"sb-input mt-2 w-full\">\n            \u003c/div>\n            \u003cdiv class=\"grid grid-cols-1 gap-5 sm:grid-cols-2\">\n              \u003cdiv>\n                \u003clabel for=\"visit-class\" class=\"sb-small block font-medium text-[var(--ink)]\">Class\u003c/label>\n                \u003cselect id=\"visit-class\" name=\"class\" class=\"sb-input mt-2 w-full\">\n                  \u003coption>Hatha\u003c/option>\n                  \u003coption>Vinyasa\u003c/option>\n                  \u003coption>Yin\u003c/option>\n                  \u003coption>Pranayama\u003c/option>\n                  \u003coption>Beginners' series\u003c/option>\n                \u003c/select>\n              \u003c/div>\n              \u003cdiv>\n                \u003clabel for=\"visit-day\" class=\"sb-small block font-medium text-[var(--ink)]\">Preferred day\u003c/label>\n                \u003cselect id=\"visit-day\" name=\"day\" class=\"sb-input mt-2 w-full\">\n                  \u003coption>Monday\u003c/option>\n                  \u003coption>Tuesday\u003c/option>\n                  \u003coption>Wednesday\u003c/option>\n                  \u003coption>Thursday\u003c/option>\n                  \u003coption>Friday\u003c/option>\n                  \u003coption>Saturday\u003c/option>\n                  \u003coption>Sunday\u003c/option>\n                \u003c/select>\n              \u003c/div>\n            \u003c/div>\n            \u003cbutton type=\"button\" class=\"sb-btn sb-btn-primary w-full min-h-[44px]\">Request a spot\u003c/button>\n            \u003cp class=\"sb-small text-[var(--muted)]\">We reply on WhatsApp within a day.\u003c/p>\n          \u003c/form>\n        \u003c/div>\n      \u003c/div>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>\n\u003csection data-section=\"footer\" id=\"footer\" class=\"bg-[var(--surface)] text-[var(--ink)] pt-0 pb-8\">\n  \u003csvg class=\"block w-full h-4 text-[var(--line)]\" viewBox=\"0 0 1200 16\" preserveAspectRatio=\"none\" fill=\"none\" aria-hidden=\"true\">\n    \u003cpath d=\"M0 8 C 50 2, 100 2, 150 8 S 250 14, 300 8 S 400 2, 450 8 S 550 14, 600 8 S 700 2, 750 8 S 850 14, 900 8 S 1000 2, 1050 8 S 1150 14, 1200 8\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" vector-effect=\"non-scaling-stroke\"/>\n  \u003c/svg>\n  \u003cdiv class=\"sb-wrap pt-12\">\n    \u003ch2 class=\"sr-only\">Saltwater Yoga contact and links\u003c/h2>\n    \u003cdiv class=\"grid gap-8 md:grid-cols-3 md:gap-12\">\n      \u003cdiv>\n        \u003cp class=\"font-[family-name:var(--heading-font)] text-2xl text-[var(--ink)]\">Saltwater Yoga\u003c/p>\n        \u003cp class=\"sb-small mt-2 text-[var(--muted)] max-w-[32ch]\">Small yoga classes in Assagao, North Goa.\u003c/p>\n      \u003c/div>\n      \u003cdiv>\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg class=\"w-2.5 h-2.5 text-[var(--accent)]\" viewBox=\"0 0 10 10\" aria-hidden=\"true\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          Find us\n        \u003c/p>\n        \u003caddress class=\"sb-small mt-3 not-italic text-[var(--ink)]\">Studio address, Assagao, Goa 403507\u003c/address>\n        \u003cp class=\"sb-small mt-2 text-[var(--muted)]\">Open Mon-Sat 6:30-19:00, Sun 7:30-10:00\u003c/p>\n      \u003c/div>\n      \u003cnav aria-label=\"Footer\">\n        \u003cp class=\"sb-eyebrow text-[var(--muted)] flex items-center gap-2\">\n          \u003csvg class=\"w-2.5 h-2.5 text-[var(--accent)]\" viewBox=\"0 0 10 10\" aria-hidden=\"true\">\u003ccircle cx=\"5\" cy=\"5\" r=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/>\u003c/svg>\n          On this page\n        \u003c/p>\n        \u003cul class=\"mt-1 flex flex-col\">\n          \u003cli>\u003ca href=\"#classes\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Classes\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#timetable\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Timetable\u003c/a>\u003c/li>\n          \u003cli>\u003ca href=\"#visit\" class=\"sb-small inline-flex min-h-[44px] items-center text-[var(--ink)] underline underline-offset-4 decoration-[var(--line)] hover:decoration-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] rounded-sm\">Visit\u003c/a>\u003c/li>\n        \u003c/ul>\n      \u003c/nav>\n    \u003c/div>\n    \u003cdiv class=\"mt-10 border-t border-[var(--line)] pt-6\">\n      \u003cp class=\"sb-small text-[var(--muted)]\">© 2026 Saltwater Yoga. This is a sample page.\u003c/p>\n    \u003c/div>\n  \u003c/div>\n\u003c/section>\n\u003c/body>\n\u003c/html>\n"};</script>
+<script>// swarm-build preview: original cursor engine.
+// Follows the run's event stream and animates each agent assembling its real section inside an iframe stage.
+(() => {
+  'use strict';
+  const DEVICES = { desktop: { w: 1280, min: 0.42 }, mobile: { w: 390, min: 0.6 } };
+  const SECTION_BUDGET_MS = 9000; // assembly animation per section at 1x
+  const MAX_ANIMATED_STEPS = 70;
+  const SLOT_H = { short: 140, medium: 460, tall: 700 };
+  const INLINE = new Set(['a', 'span', 'strong', 'em', 'b', 'i', 'u', 'br', 'small', 'code', 'mark', 'sup', 'sub', 'abbr', 'time', 's', 'del', 'ins', 'kbd', 'label', 'q', 'cite', 'wbr']);
+  const MEDIA = new Set(['svg', 'img', 'video', 'canvas', 'picture']);
+  const REASON = { build: 'writing', fix: 'fixing', comment: 'comment' };
+
+  const $ = (s) => document.querySelector(s);
+  const canvas = $('#canvas'), frameBody = $('#frame-body'), iframe = $('#stage'), overlay = $('#overlay');
+  const params = new URLSearchParams(location.search);
+  const EMBED = window.__SWARM_EMBED__ || null; // static share file: events baked in, no server
+
+  const S = {
+    speed: Math.min(3, Math.max(1, Number(params.get('speed')) || 1)),
+    device: params.get('device') === 'mobile' ? 'mobile' : 'desktop',
+    autolive: params.get('autolive') === '1',
+    events: [], received: -1, timers: [], token: 0, ready: false, queue: [],
+    mode: 'idle', scale: 1, plan: null, meta: null, stats: null,
+    agents: new Map(), planner: null, reviewer: null, animating: 0, clock: null, clockStop: null,
+    userScrollAt: 0, finaleShown: false, commenting: false, comments: new Map(), canApply: false,
+    hoverEl: null, popTarget: null, replaying: false,
+  };
+  window.__swarm = S;
+  let doc = null, win = null; // stage document and window
+
+  // ---------- helpers ----------
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const fmtS = (ms) => `${(ms / 1000).toFixed(1)}s`;
+  const fmtK = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const live = (tok) => tok === S.token;
+  const css = (s) => (window.CSS && CSS.escape ? CSS.escape(s) : s);
+
+  function tween(ms, fn, tok) {
+    return new Promise((resolve) => {
+      const t0 = performance.now();
+      const tick = (now) => {
+        if (!live(tok)) return resolve(false);
+        const p = ms <= 0 ? 1 : Math.min(1, (now - t0) / ms);
+        fn(p);
+        if (p < 1) requestAnimationFrame(tick); else resolve(true);
+      };
+      requestAnimationFrame(tick);
+    });
+  }
+
+  // Stage element rect -> client coordinates of the parent page.
+  function rectOf(el) {
+    const r = el.getBoundingClientRect();
+    const f = iframe.getBoundingClientRect();
+    const s = S.scale;
+    const left = f.left + r.left * s, top = f.top + r.top * s, width = r.width * s, height = r.height * s;
+    return { left, top, width, height, right: left + width, bottom: top + height, iw: r.width, ih: r.height };
+  }
+
+  // ---------- stage iframe ----------
+  const STAGE_DOC = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.tailwindcss.com"><\/script>
+<link id="sb-fonts" rel="stylesheet" href="data:text/css,">
+<style id="sb-theme"></style>
+<style>
+html,body{margin:0;overflow:hidden}
+.min-h-screen,.h-screen{min-height:680px!important;height:auto!important}
+.sb-empty{height:720px;display:grid;place-items:center;color:#a8a29e;font:500 22px Inter,system-ui,sans-serif}
+.sb-slot{position:relative;margin:14px 24px;border:2px dashed color-mix(in srgb,var(--c) 55%,transparent);border-radius:16px;background:color-mix(in srgb,var(--c) 5%,transparent);overflow:hidden;padding:22px 26px;font-family:Inter,system-ui,sans-serif}
+.sb-slot-label{font-size:20px;color:#3f3a35}.sb-slot-label b{color:var(--c)}
+.sb-slot-brief{margin-top:8px;max-width:760px;font-size:15px;line-height:1.5;color:#78716c}
+.sb-slot-bar{position:absolute;left:26px;right:26px;bottom:22px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--c) 15%,transparent);overflow:hidden}
+.sb-slot-bar i{display:block;height:100%;width:0;background:var(--c);border-radius:3px;transition:width .3s}
+.sb-slot::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);background-size:250% 100%;animation:sbshim 1.8s linear infinite}
+.sb-slot.failed{border-style:solid;border-color:#dc2626}
+@keyframes sbshim{from{background-position:150% 0}to{background-position:-100% 0}}
+</style></head><body><div id="root"><div class="sb-empty">Waiting for the planner…</div></div></body></html>`;
+
+  function setupStage() {
+    return new Promise((resolve) => {
+      iframe.addEventListener('load', () => {
+        doc = iframe.contentDocument;
+        win = iframe.contentWindow;
+        doc.addEventListener('mousemove', onStageMove, true);
+        doc.addEventListener('click', onStageClick, true);
+        doc.addEventListener('keydown', onKey);
+        doc.addEventListener('wheel', () => { S.userScrollAt = performance.now(); }, { passive: true });
+        resolve();
+      }, { once: true });
+      iframe.srcdoc = STAGE_DOC;
+    });
+  }
+  const root = () => doc.getElementById('root');
+  const hostOf = (id) => doc.querySelector(`[data-slot="${css(id)}"]`) || doc.querySelector(`[data-section="${css(id)}"]`);
+
+  // ---------- cursors ----------
+  class Cursor {
+    constructor(name, color, x, y) {
+      this.el = document.createElement('div');
+      this.el.className = 'cursor';
+      this.el.style.setProperty('--c', color);
+      this.el.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 2.5v17l4.6-4.2 3.2 7 3-1.4-3.2-6.9h6.4z" fill="${color}" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="tag"></span><span class="bubble"></span>`;
+      this.el.querySelector('.tag').textContent = name;
+      this.bubble = this.el.querySelector('.bubble');
+      overlay.append(this.el);
+      this.move(x, y);
+      this.say('');
+    }
+    move(x, y) { this.x = x; this.y = y; this.el.style.transform = `translate(${x}px, ${y}px)`; }
+    say(t) { if (t === this._said) return; this._said = t; this.bubble.textContent = t; this.bubble.style.display = t ? '' : 'none'; }
+    travel(target, ms, tok) {
+      const sx = this.x, sy = this.y;
+      return tween(ms, (p) => { const t = target(); const e = ease(p); this.move(lerp(sx, t.x, e), lerp(sy, t.y, e)); }, tok);
+    }
+    state(cls) { this.el.classList.remove('parked', 'gone'); if (cls) this.el.classList.add(cls); }
+    remove() { this.el.remove(); }
+  }
+
+  function makeBox(color, cls = '') {
+    const b = document.createElement('div');
+    b.className = `dragbox ${cls}`;
+    b.style.setProperty('--c', color);
+    b.innerHTML = '<span class="dim"></span>';
+    overlay.append(b);
+    return b;
+  }
+  const place = (el, x, y, w, h) => Object.assign(el.style, { transform: `translate(${x}px, ${y}px)`, width: `${Math.max(0, w)}px`, height: `${Math.max(0, h)}px` });
+
+  // ---------- panel ----------
+  function logLine(t, html) {
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${fmtS(t || 0)}</span>${html}`;
+    $('#log').prepend(li);
+  }
+  const setPhase = (t) => { $('#phase').textContent = t; };
+  const who = (a) => `<b style="color:${a.color}">${esc(a.name)}</b>`;
+
+  function agentRow(a) {
+    let li = document.querySelector(`#agents li[data-id="${css(a.id)}"]`);
+    if (!li) {
+      li = document.createElement('li');
+      li.dataset.id = a.id;
+      li.style.setProperty('--c', a.color);
+      li.innerHTML = '<span class="dot"></span><span class="who"></span><span class="t"></span><span class="what"></span>';
+      $('#agents').append(li);
+      li.querySelector('.who').innerHTML = `${esc(a.name)}<small>${esc(a.section.name)}</small>`;
+    }
+    li.dataset.status = a.status;
+    const what = {
+      thinking: `${REASON[a.reason] || 'writing'} · ${fmtK(a.chars)} chars`,
+      building: `assembling · ${a.step}/${a.steps}`,
+      done: `${a.rebuilds ? `done (${a.rebuilds} rebuild${a.rebuilds > 1 ? 's' : ''})` : 'done'} · ${fmtK(a.chars)} chars in ${fmtS(a.ms || 0)}`,
+      failed: 'failed',
+    }[a.status];
+    li.querySelector('.what').textContent = what;
+    const t = a.status === 'done' || a.status === 'failed' ? a.ms || 0 : performance.now() - a.startAt;
+    li.querySelector('.t').textContent = fmtS(t);
+  }
+
+  function renderComments() {
+    const list = [...S.comments.values()];
+    const open = list.filter((c) => c.status === 'open').length;
+    $('#comment-count').textContent = list.length ? `· ${open} open` : '';
+    $('#comments').innerHTML = list.map((c, i) => `<li data-id="${esc(c.id)}" data-status="${esc(c.status)}"><span class="n">${i + 1}</span><span>${esc(c.text)}<small>${esc(c.section)}${c.target ? ` · ${esc(c.target.slice(0, 60))}` : ''}${c.status !== 'open' ? ` · ${esc(c.status)}` : ''}</small></span></li>`).join('');
+    $('#apply').hidden = !open || EMBED;
+    $('#comment-hint').hidden = list.length > 0 || EMBED;
+    overlay.querySelectorAll('.pin').forEach((p) => { if (!S.comments.has(p.dataset.id)) p.remove(); });
+    list.forEach((c, i) => {
+      let pin = overlay.querySelector(`.pin[data-id="${css(c.id)}"]`);
+      if (!pin) { pin = document.createElement('div'); pin.className = 'pin'; pin.dataset.id = c.id; overlay.append(pin); }
+      pin.textContent = String(i + 1);
+      pin.className = `pin ${c.status === 'open' ? '' : c.status}`;
+    });
+  }
+
+  function commentEl(c) {
+    const sec = doc && doc.querySelector(`[data-section="${css(c.section)}"]`);
+    if (!sec) return hostOf(c.section);
+    if (c.path) { try { const el = sec.querySelector(c.path); if (el) return el; } catch {} }
+    return sec;
+  }
+
+  // ---------- reset ----------
+  function reset() {
+    S.token++;
+    S.timers.forEach(clearTimeout);
+    S.timers = [];
+    S.agents.forEach((a) => a.cursor.remove());
+    S.agents.clear();
+    [S.planner, S.reviewer].forEach((c) => c && c.remove());
+    S.planner = S.reviewer = null;
+    overlay.innerHTML = '';
+    S.comments.clear();
+    if (doc) {
+      root().innerHTML = '<div class="sb-empty">Waiting for the planner…</div>';
+      doc.getElementById('sb-theme').textContent = '';
+    }
+    ['#agents', '#log', '#review', '#comments'].forEach((s) => ($(s).innerHTML = ''));
+    $('#review-box').hidden = true;
+    $('#finale').hidden = true;
+    $('#apply-msg').hidden = true;
+    Object.assign(S, { mode: 'idle', plan: null, stats: null, animating: 0, finaleShown: false, clock: null, clockStop: null });
+    renderComments();
+    window.__swarmDone = false;
+  }
+
+  // ---------- events ----------
+  function handle(e) {
+    const tok = S.token;
+    switch (e.type) {
+      case 'meta':
+        S.meta = e;
+        S.clock = performance.now() - (e.t || 0) / (S.replaying ? S.speed : 1);
+        $('#brief').textContent = e.brief; $('#brief').title = e.brief;
+        $('#model').textContent = e.model ? `${e.model}` : e.mode === 'agent' ? 'your coding agent' : '';
+        logLine(e.t, '<b>brief</b> received');
+        break;
+      case 'plan:start': {
+        S.mode = 'planning';
+        setPhase('planning');
+        const r = canvas.getBoundingClientRect();
+        S.planner = new Cursor('Planner', '#111111', r.left + r.width / 2, r.top + r.height / 2);
+        S.planner.say('choosing a design direction…');
+        logLine(e.t, '<b>planner</b> started');
+        break;
+      }
+      case 'plan:done':
+        S.plan = e.plan;
+        doc.getElementById('sb-theme').textContent = e.stageCSS || '';
+        if (e.fonts) doc.getElementById('sb-fonts').href = e.fonts;
+        renderSlots(e.plan);
+        S.mode = 'build';
+        setPhase('building');
+        $('#frame-url').textContent = e.plan.title;
+        if (S.planner) S.planner.say(`plan ready · ${e.plan.sections.length} sections`);
+        else { const r = canvas.getBoundingClientRect(); S.planner = new Cursor('Planner', '#111111', r.left + r.width / 2, r.top + 120); S.planner.say(`plan ready · ${e.plan.sections.length} sections`); }
+        logLine(e.t, `<b>plan</b> ${e.plan.sections.length} sections${e.ms ? ` in ${fmtS(e.ms)}` : ''}`);
+        if (e.plan.design?.direction) logLine(e.t, `<b>direction</b> ${esc(e.plan.design.direction.slice(0, 140))}${e.plan.design.direction.length > 140 ? '…' : ''}`);
+        setTimeout(() => S.planner && S.planner.state('gone'), 2500 / S.speed);
+        break;
+      case 'agent:start': {
+        if (!S.plan) break;
+        const section = S.plan.sections.find((s) => s.id === e.id);
+        if (!section) break;
+        let a = S.agents.get(e.id);
+        const reason = e.reason || 'build';
+        if (!a) {
+          const from = S.planner || { x: innerWidth / 2, y: innerHeight / 2 };
+          a = { id: e.id, name: e.agent.name, color: e.agent.color, section, chars: 0, rebuilds: 0, phase: Math.random() * 6.28, cursor: new Cursor(e.agent.name, e.agent.color, from.x, from.y) };
+          S.agents.set(e.id, a);
+        } else {
+          a.rebuilds++;
+          a.cursor.state();
+        }
+        Object.assign(a, { status: 'thinking', reason, chars: 0, startAt: performance.now(), ms: null, step: 0, steps: 0, note: e.note || '' });
+        if (reason !== 'build') {
+          a.rework && a.rework.remove();
+          a.rework = makeBox(a.color, 'rework');
+          if (reason === 'comment') S.comments.forEach((c) => { if (c.section === e.id && c.status === 'open') c.status = 'working'; });
+          renderComments();
+        }
+        agentRow(a);
+        logLine(e.t, `${who(a)} ${reason === 'build' ? '→' : reason === 'fix' ? 'fixing' : 'comment on'} ${esc(section.name)}${e.note ? ` <span>${esc(e.note.slice(0, 80))}</span>` : ''}`);
+        break;
+      }
+      case 'agent:progress': {
+        const a = S.agents.get(e.id);
+        if (!a) break;
+        a.chars = e.chars;
+        const bar = doc.querySelector(`.sb-slot[data-slot="${css(e.id)}"] .sb-slot-bar i`);
+        if (bar) bar.style.width = `${clamp(e.chars / 9000, 0.03, 0.97) * 100}%`;
+        break;
+      }
+      case 'agent:done': {
+        let a = S.agents.get(e.id);
+        if (!a && S.plan) { handle({ type: 'agent:start', id: e.id, agent: e.agent, reason: e.reason, t: e.t }); a = S.agents.get(e.id); }
+        if (!a) break;
+        a.chars = e.chars || e.html.length;
+        a.ms = e.ms;
+        if (a.rework) { a.rework.remove(); a.rework = null; }
+        logLine(e.t, `${who(a)} ${e.reason === 'build' || !e.reason ? 'wrote' : 'rebuilt'} ${esc(a.section.name)}${e.ms ? ` · ${fmtS(e.ms)}` : ''}`);
+        S.animating++;
+        assemble(a, e.html, tok)
+          .catch((err) => console.error('assemble failed', err))
+          .finally(() => {
+            if (!live(tok)) return;
+            S.animating--;
+            (e.resolves || []).forEach((id) => { const c = S.comments.get(id); if (c) c.status = 'resolved'; });
+            renderComments();
+            maybeFinale();
+          });
+        break;
+      }
+      case 'agent:error': {
+        const a = S.agents.get(e.id);
+        if (!a) break;
+        a.status = 'failed'; a.ms = performance.now() - a.startAt;
+        a.cursor.say('failed');
+        if (a.rework) { a.rework.remove(); a.rework = null; }
+        const slot = doc.querySelector(`.sb-slot[data-slot="${css(e.id)}"]`);
+        if (slot) { slot.classList.add('failed'); slot.querySelector('.sb-slot-brief').textContent = e.message; }
+        logLine(e.t, `<b style="color:#fca5a5">${esc(a.name)} failed</b> <span>${esc(String(e.message).slice(0, 100))}</span>`);
+        maybeFinale();
+        break;
+      }
+      case 'review:start': {
+        S.mode = 'review';
+        setPhase('reviewing');
+        const r = canvas.getBoundingClientRect();
+        S.reviewer = S.reviewer || new Cursor('Reviewer', '#f2b84b', r.left + r.width / 2, r.top + 80);
+        S.reviewer.state();
+        S.reviewer.say('checking contrast, hierarchy, layout…');
+        logLine(e.t, '<b>review</b> started');
+        break;
+      }
+      case 'review:done': {
+        S.mode = 'build';
+        setPhase('building');
+        if (S.reviewer) { S.reviewer.say(e.fixes?.length ? `${e.fixes.length} section(s) to fix` : 'looks good'); setTimeout(() => S.reviewer && S.reviewer.state('gone'), 1800 / S.speed); }
+        const box = $('#review');
+        const real = (e.findings || []).filter((f) => f.severity !== 'info');
+        box.innerHTML = `<div>${esc(e.summary || '')}</div><div><b>${real.length}</b> automated finding${real.length === 1 ? '' : 's'}, <b>${(e.fixes || []).length}</b> fix${(e.fixes || []).length === 1 ? '' : 'es'}</div>`
+          + (e.fixes || []).map((f) => `<div class="fix"><strong>${esc(f.id)}</strong> · ${esc(f.problem)}</div>`).join('');
+        $('#review-box').hidden = false;
+        logLine(e.t, `<b>review</b> ${(e.fixes || []).length} fixes`);
+        break;
+      }
+      case 'comment:add':
+        S.comments.set(e.comment.id, { ...e.comment });
+        renderComments();
+        logLine(e.t, `<b>comment</b> on ${esc(e.comment.section)}: ${esc(e.comment.text.slice(0, 60))}`);
+        break;
+      case 'done':
+        S.stats = e.stats;
+        logLine(e.t, `<b>done</b>${e.stats.speedup ? ` ${e.stats.speedup}× vs one agent` : ''}`);
+        maybeFinale();
+        break;
+      case 'error':
+        $('#error').textContent = `Build failed: ${e.message}`;
+        $('#error').hidden = false;
+        setPhase('error');
+        break;
+    }
+  }
+
+  function renderSlots(plan) {
+    root().innerHTML = '';
+    plan.sections.forEach((s) => {
+      const ag = s.agent || { name: 'Agent', color: '#888' };
+      const d = doc.createElement('div');
+      d.className = 'sb-slot';
+      d.dataset.slot = s.id;
+      d.style.setProperty('--c', ag.color);
+      d.style.height = `${SLOT_H[s.height] || SLOT_H.medium}px`;
+      d.innerHTML = `<div class="sb-slot-label"><b>${esc(ag.name)}</b> · ${esc(s.name)}</div><div class="sb-slot-brief">${esc(s.brief)}</div><div class="sb-slot-bar"><i></i></div>`;
+      root().append(d);
+    });
+  }
+
+  // ---------- step extraction ----------
+  const transparent = (c) => !c || c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c);
+  function isBox(el, cs) {
+    const tag = el.localName;
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'hr') return true;
+    if (!transparent(cs.backgroundColor)) return true;
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') return true;
+    if (cs.boxShadow && cs.boxShadow !== 'none') return true;
+    for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
+      if (parseFloat(cs[`border${side}Width`]) > 0 && cs[`border${side}Style`] !== 'none' && !transparent(cs[`border${side}Color`])) return true;
+    }
+    return false;
+  }
+  function isTextBlock(el) {
+    if (!el.textContent.trim()) return false;
+    for (const d of el.querySelectorAll('*')) {
+      if (d.closest('svg')) continue;
+      if (!INLINE.has(d.localName)) return false;
+    }
+    return true;
+  }
+  function collect(sec) {
+    const steps = [], structural = [];
+    const visit = (el, depth) => {
+      if (MEDIA.has(el.localName)) { steps.push({ kind: 'media', el, depth }); return; }
+      const cs = win.getComputedStyle(el);
+      if (cs.display === 'none') return;
+      const box = isBox(el, cs);
+      if (el !== sec && isTextBlock(el)) { steps.push({ kind: box ? 'button' : 'text', el, depth }); return; }
+      if (box) steps.push({ kind: 'rect', el, depth }); else structural.push(el);
+      for (const c of el.children) visit(c, depth + 1);
+    };
+    visit(sec, 0);
+    return { steps, structural };
+  }
+  const textNodes = (el) => {
+    const out = [];
+    const w = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('svg') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    while (w.nextNode()) out.push(w.currentNode);
+    return out;
+  };
+  const revealDeep = (el) => { el.style.visibility = 'visible'; el.querySelectorAll('*').forEach((d) => d.style && (d.style.visibility = 'visible')); };
+  const fadeIn = (el, extra = {}) => { try { el.animate([{ opacity: 0, ...extra }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'ease-out' }); } catch {} };
+
+  // ---------- assembling one section ----------
+  async function assemble(a, html, tok) {
+    const host = hostOf(a.id);
+    const tpl = doc.createElement('template');
+    tpl.innerHTML = html.trim();
+    const sec = tpl.content.querySelector('section') || tpl.content.firstElementChild;
+    if (!sec || !host) return;
+    const all = [sec, ...sec.querySelectorAll('*')].filter((e) => e.localName === 'svg' || !e.parentElement || !e.parentElement.closest('svg'));
+    all.forEach((e) => e.style && (e.style.visibility = 'hidden'));
+    host.replaceWith(sec);
+    a.el = sec;
+    a.status = 'building';
+    a.step = 0;
+    await sleep(260); // Tailwind's runtime generates classes after the DOM changes
+    if (!live(tok)) return;
+
+    const { steps, structural } = collect(sec);
+    structural.forEach((e) => (e.style.visibility = 'visible'));
+    const base = sec.getBoundingClientRect();
+    for (const s of steps) {
+      const r = s.el.getBoundingClientRect();
+      s.top = r.top - base.top;
+      s.left = r.left - base.left;
+      s.area = r.width * r.height;
+      s.chars = s.kind === 'text' || s.kind === 'button' ? s.el.textContent.trim().length : 0;
+      s.zero = r.width < 1 || r.height < 1;
+    }
+    const ordered = steps.filter((s) => !s.zero).sort((x, y) => Math.round(x.top / 6) - Math.round(y.top / 6) || x.depth - y.depth || x.left - y.left);
+    const rank = [...ordered].sort((x, y) => (y.area + y.chars * 400) - (x.area + x.chars * 400));
+    rank.forEach((s, i) => { s.instant = i >= MAX_ANIMATED_STEPS || (s.kind === 'rect' && s.area < 900) || ((s.kind === 'text' || s.kind === 'button') && s.chars < 2); });
+    const dur = (s) => (s.instant ? 0 : 240 + (s.kind === 'rect' ? 380 + Math.min(300, s.area / 2000) : s.kind === 'media' ? 450 : s.kind === 'button' ? 380 + Math.min(900, s.chars * 22) : Math.min(1400, Math.max(250, s.chars * 22))));
+    const total = ordered.reduce((n, s) => n + dur(s), 0) || 1;
+    const k = Math.min(1, (a.reason === 'build' ? SECTION_BUDGET_MS : SECTION_BUDGET_MS * 0.6) / total) / S.speed;
+    a.steps = ordered.length;
+
+    for (const s of ordered) {
+      if (!live(tok)) return;
+      a.step++;
+      if (s.instant) { revealDeep(s.el); continue; }
+      await runStep(a, s, dur(s) * k, tok);
+    }
+    all.forEach((e) => e.style && (e.style.visibility = ''));
+    a.status = 'done';
+    a.cursor.say(`done · ${fmtS(a.ms || 0)}`);
+    await a.cursor.travel(() => { const r = rectOf(sec); return { x: r.right - Math.min(140, r.width / 3), y: r.top + 16 }; }, 400 / S.speed, tok);
+    a.cursor.state('parked');
+  }
+
+  async function runStep(a, s, d, tok) {
+    const el = s.el, c = a.cursor;
+    const travel = Math.min(260, d * 0.3);
+    const work = d - travel;
+    const rect = () => rectOf(el);
+
+    if (s.kind === 'rect' || s.kind === 'button') {
+      c.say(s.kind === 'button' ? 'button' : `<${el.localName}>`);
+      await c.travel(() => { const r = rect(); return { x: r.left, y: r.top }; }, travel, tok);
+      const box = makeBox(a.color);
+      const dim = box.firstChild;
+      await tween(s.kind === 'button' ? work * 0.4 : work, (p) => {
+        const r = rect(); const e = ease(p);
+        place(box, r.left, r.top, r.width * e, r.height * e);
+        dim.textContent = `${Math.round(r.iw * e)} × ${Math.round(r.ih * e)}`;
+        c.move(r.left + r.width * e, r.top + r.height * e);
+      }, tok);
+      box.remove();
+      el.style.visibility = 'visible';
+      if (s.kind === 'rect') { fadeIn(el); return; }
+      await typeInto(a, el, work * 0.6, tok);
+      return;
+    }
+    if (s.kind === 'text') {
+      c.say('typing');
+      await c.travel(() => { const r = rect(); return { x: r.left, y: r.top + Math.min(r.height, 28 * S.scale) / 2 }; }, travel, tok);
+      await typeInto(a, el, work, tok);
+      return;
+    }
+    c.say(el.localName === 'svg' ? 'drawing svg' : 'media');
+    await c.travel(() => { const r = rect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, travel, tok);
+    const box = makeBox(a.color, 'media');
+    box.firstChild.textContent = el.localName;
+    await tween(work * 0.65, () => { const r = rect(); place(box, r.left, r.top, r.width, r.height); c.move(r.left + r.width / 2, r.top + r.height / 2); }, tok);
+    box.remove();
+    revealDeep(el);
+    fadeIn(el, { transform: 'scale(.92)' });
+    await sleep(work * 0.35);
+  }
+
+  async function typeInto(a, el, ms, tok) {
+    const c = a.cursor;
+    const cs = win.getComputedStyle(el);
+    const prev = { minHeight: el.style.minHeight, minWidth: el.style.minWidth };
+    if (cs.display !== 'inline') { el.style.minHeight = `${el.offsetHeight}px`; el.style.minWidth = `${el.offsetWidth}px`; }
+    const nodes = textNodes(el);
+    const orig = nodes.map((n) => n.data);
+    const lens = orig.map((t) => t.length);
+    const totalChars = lens.reduce((x, y) => x + y, 0);
+    nodes.forEach((n) => (n.data = ''));
+    revealDeep(el);
+    const lineH = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.3 || 20;
+    const fill = (n) => { let left = n; nodes.forEach((node, i) => { const take = Math.max(0, Math.min(lens[i], left)); left -= take; const want = orig[i].slice(0, take); if (node.data !== want) node.data = want; }); };
+    await tween(ms, (p) => {
+      fill(Math.round(totalChars * p));
+      const r = rectOf(el);
+      const lh = lineH * S.scale;
+      const lines = Math.max(1, Math.round(r.height / lh));
+      const lp = p * lines;
+      const li = Math.min(lines - 1, Math.floor(lp));
+      c.move(r.left + r.width * (lp - li), r.top + (li + 0.5) * lh);
+    }, tok);
+    fill(totalChars);
+    el.style.minHeight = prev.minHeight;
+    el.style.minWidth = prev.minWidth;
+  }
+
+  // ---------- finale, go live ----------
+  function busy() { return S.animating > 0 || [...S.agents.values()].some((a) => a.status === 'thinking' || a.status === 'building'); }
+  function maybeFinale() {
+    if (!S.stats || busy() || S.finaleShown) return;
+    S.finaleShown = true;
+    S.clockStop = performance.now();
+    setPhase('done');
+    const st = S.stats;
+    $('#f-wall').textContent = fmtS(st.wallMs);
+    $('#f-line').textContent = st.planMs
+      ? `${st.sections} sections planned in ${fmtS(st.planMs)}, then built at the same time in ${fmtS(st.buildWallMs)}.`
+      : `${st.sections} sections built at the same time in ${fmtS(st.buildWallMs)}.`;
+    $('#f-agents').textContent = String(st.built ?? st.sections);
+    $('#f-seq').textContent = st.sumMs ? fmtS(st.sumMs) : '—';
+    $('#f-speed').textContent = st.speedup ? `${st.speedup}×` : '—';
+    $('#f-cost').textContent = st.costUsd != null ? `$${st.costUsd.toFixed(3)}` : st.tokens ? `${fmtK(st.tokens.out)} tokens` : 'your agent';
+    $('#finale').hidden = false;
+    if (S.autolive) setTimeout(() => goLive(), 2600);
+  }
+
+  async function goLive() {
+    const tok = S.token;
+    $('#finale').hidden = true;
+    S.mode = 'live';
+    setPhase('live');
+    S.agents.forEach((a) => a.cursor.state('gone'));
+    await sleep(700);
+    if (!live(tok)) return;
+    canvas.scrollTop = 0;
+    if (S.autolive) {
+      await sleep(800);
+      const max = () => canvas.scrollHeight - canvas.clientHeight;
+      await tween(clamp(max() * 3.2, 5000, 16000), (p) => { canvas.scrollTop = max() * (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2); }, tok);
+      await sleep(900);
+      window.__swarmDone = true;
+    }
+  }
+
+  // ---------- replay ----------
+  // Long idle gaps (a person thinking, an agent between steps) are squeezed to MAX_GAP so replays stay watchable.
+  const MAX_GAP = 3000;
+  function replay(evs = S.events.slice()) {
+    reset();
+    const tok = S.token;
+    S.replaying = true;
+    let prev = 0, shift = 0;
+    evs = evs.map((e) => { const t = e.t || 0; if (t - prev > MAX_GAP) shift += t - prev - MAX_GAP; prev = t; return { ...e, t: t - shift }; });
+    evs.forEach((e) => S.timers.push(setTimeout(() => live(tok) && handle(e), e.t / S.speed)));
+    const end = evs.length ? (evs[evs.length - 1].t || 0) / S.speed + 20 : 0;
+    S.timers.push(setTimeout(() => { if (!live(tok)) return; S.replaying = false; S.queue.splice(0).forEach((e) => handle(e)); }, end));
+    S.clock = performance.now();
+  }
+
+  // ---------- comments ----------
+  function setCommenting(on) {
+    if (EMBED) return;
+    S.commenting = on;
+    document.body.classList.toggle('commenting', on);
+    $('#comment-toggle').setAttribute('aria-pressed', String(on));
+    if (!on) { hideHover(); closePopover(); }
+    else { $('#finale').hidden = true; S.mode = S.mode === 'build' ? 'build' : 'live'; S.agents.forEach((a) => a.status === 'done' && a.cursor.state('gone')); }
+  }
+  function hideHover() { overlay.querySelector('.hoverbox')?.remove(); S.hoverEl = null; }
+  function pickTarget(t) {
+    let el = t && t.nodeType === 1 ? t : t?.parentElement;
+    if (!el || !el.closest('[data-section]')) return null;
+    if (el.closest('svg') && el.localName !== 'svg') el = el.closest('svg');
+    return el;
+  }
+  function describe(el) {
+    const text = el.textContent.trim().replace(/\s+/g, ' ').slice(0, 70);
+    return `<${el.localName}>${text ? ` "${text}"` : ''}`;
+  }
+  function pathWithin(el, sec) {
+    if (el === sec) return '';
+    const parts = [];
+    for (let n = el; n && n !== sec; n = n.parentElement) {
+      const sibs = [...n.parentElement.children].filter((x) => x.localName === n.localName);
+      parts.unshift(sibs.length > 1 ? `${n.localName}:nth-of-type(${sibs.indexOf(n) + 1})` : n.localName);
+    }
+    return `:scope > ${parts.join(' > ')}`;
+  }
+  function onStageMove(e) {
+    if (!S.commenting || !$('#popover').hidden) return;
+    const el = pickTarget(e.target);
+    if (!el) return hideHover();
+    S.hoverEl = el;
+    let box = overlay.querySelector('.hoverbox');
+    if (!box) { box = document.createElement('div'); box.className = 'hoverbox'; box.innerHTML = '<span></span>'; overlay.append(box); }
+    box.firstChild.textContent = `${el.closest('[data-section]').dataset.section} › ${el.localName}`;
+  }
+  function onStageClick(e) {
+    const a = e.target.closest && e.target.closest('a');
+    if (S.commenting) {
+      e.preventDefault(); e.stopPropagation();
+      const el = pickTarget(e.target);
+      if (el) openPopover(el);
+      return;
+    }
+    if (a) {
+      e.preventDefault();
+      const id = (a.getAttribute('href') || '').startsWith('#') ? a.getAttribute('href').slice(1) : null;
+      const target = id && doc.getElementById(id);
+      if (target) { const r = rectOf(target); canvas.scrollTo({ top: canvas.scrollTop + r.top - canvas.getBoundingClientRect().top, behavior: 'smooth' }); }
+    }
+  }
+  function openPopover(el) {
+    const sec = el.closest('[data-section]');
+    S.popTarget = { el, section: sec.dataset.section, target: describe(el), path: pathWithin(el, sec) };
+    $('#pop-target').textContent = `${S.popTarget.section} · ${S.popTarget.target}`;
+    const r = rectOf(el);
+    const pop = $('#popover');
+    pop.hidden = false;
+    pop.style.left = `${clamp(r.left, 8, innerWidth - 316)}px`;
+    pop.style.top = `${clamp(r.bottom + 8, 64, innerHeight - 170)}px`;
+    $('#pop-text').value = '';
+    $('#pop-text').focus();
+  }
+  function closePopover() { $('#popover').hidden = true; S.popTarget = null; }
+  async function submitComment(ev) {
+    ev.preventDefault();
+    const text = $('#pop-text').value.trim();
+    if (!text || !S.popTarget) return;
+    const { section, target, path } = S.popTarget;
+    closePopover();
+    const r = await fetch('api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section, target, path, text }) });
+    if (!r.ok) showError(`Comment failed: ${(await r.json().catch(() => ({}))).error || r.status}`);
+  }
+  async function applyComments() {
+    const r = await fetch('api/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const j = await r.json().catch(() => ({}));
+    const msg = $('#apply-msg');
+    msg.hidden = false;
+    msg.textContent = j.started ? 'Agents are on it…' : (j.message || 'Ask your coding agent to apply the comments.');
+    if (j.started) setCommenting(false);
+  }
+  function showError(t) { const e = $('#error'); e.textContent = t; e.hidden = false; setTimeout(() => (e.hidden = true), 5000); }
+
+  // ---------- frame loop ----------
+  function frame(now) {
+    if (doc && root()) {
+      const dev = DEVICES[S.device];
+      const fitW = Math.min(1, (canvas.clientWidth - 48) / dev.w);
+      const stageH = Math.max(root().offsetHeight, 720);
+      const fitH = (canvas.clientHeight - 48 - 32) / stageH;
+      const target = S.mode === 'build' || S.mode === 'review' ? clamp(fitH, dev.min, fitW) : fitW;
+      S.scale = Math.abs(target - S.scale) < 0.001 ? target : lerp(S.scale, target, 0.06);
+      if (iframe.style.width !== `${dev.w}px`) iframe.style.width = `${dev.w}px`;
+      iframe.style.height = `${stageH}px`;
+      iframe.style.transform = `scale(${S.scale})`;
+      frameBody.style.width = `${dev.w * S.scale}px`;
+      frameBody.style.height = `${stageH * S.scale}px`;
+      $('#frame').style.width = `${dev.w * S.scale}px`;
+
+      const t = now / 1000;
+      if (S.planner && S.mode === 'planning') {
+        const r = canvas.getBoundingClientRect();
+        S.planner.move(r.left + r.width / 2 + Math.cos(t * 1.6) * 160, r.top + r.height * 0.42 + Math.sin(t * 2.1) * 70);
+      }
+      if (S.reviewer && S.mode === 'review') {
+        const f = iframe.getBoundingClientRect();
+        const cr = canvas.getBoundingClientRect();
+        const y = Math.max(f.top, cr.top) + ((t * 120) % Math.max(200, Math.min(f.height, cr.height) - 60));
+        S.reviewer.move(lerp(S.reviewer.x, f.left + f.width * (0.3 + 0.4 * Math.sin(t * 0.8)), 0.08), lerp(S.reviewer.y, y, 0.15));
+      }
+      const followY = [];
+      S.agents.forEach((a) => {
+        if (a.status === 'thinking') {
+          const host = hostOf(a.id);
+          if (host) {
+            const r = rectOf(host);
+            const tx = r.left + r.width * (0.55 + 0.28 * Math.sin(t * 0.9 + a.phase));
+            const ty = r.top + Math.min(r.height, 300 * S.scale) * (0.55 + 0.25 * Math.cos(t * 1.3 + a.phase));
+            a.cursor.move(lerp(a.cursor.x, tx, 0.07), lerp(a.cursor.y, ty, 0.07));
+            if (a.rework) place(a.rework, r.left, r.top, r.width, r.height);
+          }
+          a.cursor.say(a.reason === 'build' ? `thinking · ${fmtK(a.chars)} chars` : `${REASON[a.reason]}${a.note ? `: ${a.note.slice(0, 40)}` : ''}${a.chars ? ` · ${fmtK(a.chars)}` : ''}`);
+          if (a.reason !== 'build') followY.push(a.cursor.y);
+        }
+        if (a.status === 'building') followY.push(a.cursor.y);
+        agentRow(a);
+      });
+      // comment pins and hover box follow their elements
+      S.comments.forEach((c) => {
+        const pin = overlay.querySelector(`.pin[data-id="${css(c.id)}"]`);
+        const el = commentEl(c);
+        if (!pin || !el) return;
+        const r = rectOf(el);
+        pin.style.transform = `translate(${r.left + 4}px, ${r.top + 4}px)`;
+      });
+      if (S.hoverEl) {
+        const box = overlay.querySelector('.hoverbox');
+        if (box && S.hoverEl.isConnected) { const r = rectOf(S.hoverEl); place(box, r.left, r.top, r.width, r.height); } else hideHover();
+      }
+      if ((S.mode === 'build' || S.mode === 'review') && now - S.userScrollAt > 2500) {
+        if (!followY.length) S.agents.forEach((a) => a.status === 'thinking' && followY.push(a.cursor.y));
+        if (S.mode === 'review' && S.reviewer) followY.push(S.reviewer.y);
+        if (followY.length) {
+          const cr = canvas.getBoundingClientRect();
+          const avg = followY.reduce((x, y) => x + y, 0) / followY.length;
+          const d = (avg - cr.top) - canvas.clientHeight * 0.45;
+          if (Math.abs(d) > 4) canvas.scrollTop += d * 0.05;
+        }
+      }
+    }
+    if (S.clock != null) $('#timer').textContent = fmtS(((S.clockStop || now) - S.clock) * (S.replaying ? S.speed : 1));
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- wiring ----------
+  function onKey(e) {
+    if (e.target.closest && e.target.closest('textarea, input')) { if (e.key === 'Escape') closePopover(); return; }
+    if (e.key === 'c' || e.key === 'C') setCommenting(!S.commenting);
+    if (e.key === 'Escape') { if (!$('#popover').hidden) closePopover(); else setCommenting(false); }
+  }
+  document.addEventListener('keydown', onKey);
+  canvas.addEventListener('wheel', () => (S.userScrollAt = performance.now()), { passive: true });
+  document.querySelectorAll('[data-speed]').forEach((b) => {
+    b.setAttribute('aria-pressed', String(Number(b.dataset.speed) === S.speed));
+    b.addEventListener('click', () => { S.speed = Number(b.dataset.speed); document.querySelectorAll('[data-speed]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); });
+  });
+  document.querySelectorAll('[data-device]').forEach((b) => {
+    b.setAttribute('aria-pressed', String(b.dataset.device === S.device));
+    b.addEventListener('click', () => { S.device = b.dataset.device; document.querySelectorAll('[data-device]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); });
+  });
+  $('#go-live').addEventListener('click', goLive);
+  $('#replay').addEventListener('click', () => replay());
+  $('#replay-top').addEventListener('click', () => replay());
+  $('#comment-toggle').addEventListener('click', () => setCommenting(!S.commenting));
+  $('#comment-now').addEventListener('click', () => { goLive(); setCommenting(true); });
+  $('#popover').addEventListener('submit', submitComment);
+  $('#pop-cancel').addEventListener('click', closePopover);
+  $('#apply').addEventListener('click', applyComments);
+  $('#comments').addEventListener('click', (e) => {
+    const li = e.target.closest('li'); if (!li) return;
+    const c = S.comments.get(li.dataset.id); const el = c && commentEl(c); if (!el) return;
+    const r = rectOf(el);
+    canvas.scrollTo({ top: canvas.scrollTop + r.top - canvas.getBoundingClientRect().top - 80, behavior: 'smooth' });
+  });
+
+  // ?replay=1: collect the saved run first, then play it back with its original timing.
+  let replayTimer = null, replayStarted = false;
+  function intake(e) {
+    if (e.type === 'hello') return;
+    if (params.get('replay') === '1' && !replayStarted && e.type !== 'reset') {
+      if (e.seq != null && e.seq <= S.received) return;
+      if (e.seq != null) S.received = e.seq;
+      S.events.push(e);
+      clearTimeout(replayTimer);
+      replayTimer = setTimeout(() => { replayStarted = true; const go = () => (S.ready ? replay(S.events.slice()) : setTimeout(go, 100)); go(); }, 400);
+      return;
+    }
+    if (e.type === 'reset') { S.events = []; S.received = -1; S.replaying = false; reset(); return; }
+    if (e.seq != null && e.seq <= S.received) return;
+    if (e.seq != null) S.received = e.seq;
+    S.events.push(e);
+    if (!S.ready || S.replaying) { S.queue.push(e); return; }
+    handle(e);
+  }
+
+  setupStage().then(() => {
+    S.ready = true;
+    reset();
+    if (EMBED) {
+      $('#comment-toggle').hidden = true;
+      $('#comments-box').hidden = true;
+      if (EMBED.page) { const url = URL.createObjectURL(new Blob([EMBED.page], { type: 'text/html' })); $('#open-page').href = url; $('#open-page-bar').href = url; }
+      S.events = EMBED.events.slice();
+      replay(S.events);
+      return;
+    }
+    S.queue.splice(0).forEach((e) => handle(e));
+  });
+  requestAnimationFrame(frame);
+
+  if (!EMBED) {
+    fetch('api/run').then((r) => r.json()).then((j) => { S.canApply = Boolean(j.canApply); }).catch(() => {});
+    const es = new EventSource('events');
+    es.onopen = () => setPhase(S.mode === 'idle' ? 'waiting' : S.mode);
+    es.onmessage = (m) => intake(JSON.parse(m.data));
+    es.onerror = () => setPhase('reconnecting');
+  }
+})();
+</script>
+</body>
+</html>

@@ -39,3 +39,37 @@
 
 - The Tailwind Play CDN is meant for prototypes. Compile Tailwind for production.
 - Media-query breakpoints follow the browser window, not the 1280 px stage, so the preview always shows the desktop layout. Check mobile with the screenshot.
+
+## v0.2: agent-native mode, design review, comments
+
+### Why the coding agent should do the work
+
+- Most people who would use this already have Claude Code, Codex, Cursor or Kiro, so asking them for a separate API key is friction.
+- Agent mode moves the thinking into their agent. The run lives in a folder (`events.jsonl`, `plan.json`, `sections/`).
+- The preview tails that folder. Any writer, whether the standalone engine, CLI calls or the MCP server, produces the same live animation.
+- Parallelism comes from the agent's own sub-agents. The skill tells the agent to start them all in one message.
+
+### Platforms
+
+- **Codex**: discovers skills in `.agents/skills/<name>/SKILL.md` per repo, or in the user's home ([Codex docs](https://developers.openai.com/codex/skills/create-skill)).
+- **Claude Code**: uses `.claude/skills/`, `.claude/agents/` for sub-agent definitions, and `.mcp.json` for project MCP servers.
+- **Cursor**: uses `.cursor/rules/*.mdc` and `.cursor/mcp.json`.
+- **Kiro**: uses `.kiro/skills/` and `.kiro/settings/mcp.json`.
+- **MCP**: one server covers every MCP-capable client. It is hand-written over stdio, so `npx` stays fast.
+
+### Design skills
+
+- **[Impeccable](https://github.com/pbakaus/impeccable)** (Apache-2.0) ships a CLI with `detect`, a deterministic anti-pattern scanner.
+  - It is used as an optional review input, run on the served page.
+  - Scanning the static file is not enough: Tailwind CSS only exists after the Play CDN runs, so a file scan reported flat type and cramped padding that were not real.
+- **[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)** (MIT) is a searchable style, palette and font database installed with `uipro init --ai <agent>`.
+- Neither project's content is bundled. `init --design` runs their installers, and our design principles are our own text.
+
+### Bugs found while testing, now fixed
+
+- **Viewport units**: `min-h-[70vh]` in a hero made the preview iframe grow without limit, because `vh` equals the iframe height and the iframe height follows the content. The hero reached 7,753 px. Sanitising now converts `vh/svh/dvh` to pixels for an 800 px screen, and the prompt forbids them.
+- **Contrast**: on the dark band the accent-coloured eyebrow text had a 1.9:1 contrast ratio (Impeccable caught it). Shared CSS now recolours `sb-eyebrow`, ghost buttons and cards inside `sb-dark`.
+- **Eyebrows and cream backgrounds**: Impeccable flags tracked-caps eyebrows above headings and default cream backgrounds as AI tells. Both are now in the design principles.
+- **False "truncated" review**: the review prompt clipped sections to 7,000 characters, so the reviewer reported the sections as cut off and rebuilt them for nothing. Long sections are now sent in full up to 16,000 characters, with an explicit note if clipped.
+- **Non-section roots**: a builder returned a `<footer>` root and the submit was rejected. Non-section roots are now wrapped instead of rejected.
+- **Idle gaps in replays**: replaying an agent-mode run took more than 6 minutes, because idle gaps (a person thinking) were kept. Replay now squeezes gaps to 3 s, and the share export of that run plays in about 35 s at 2×.
