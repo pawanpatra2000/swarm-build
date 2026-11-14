@@ -1,0 +1,126 @@
+<section data-section="hero-form" id="hero-form" class="relative bg-[var(--bg)] py-12 md:py-20 lg:py-24 border-b border-[var(--line)] overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      
+      <!-- Left Column: Copy & Explanation -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-sm font-medium">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          Traditional Vedic Astrology
+        </div>
+        
+        <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)] leading-tight">
+          Analyze Compatibility Through the Ashtakoota System
+        </h1>
+        
+        <p class="text-lg text-[var(--muted)] leading-relaxed">
+          The traditional Vedic Kundli matching system evaluates compatibility across eight distinct dimensions, known as the Ashtakoota. By assessing 36 critical points (Gunas), it provides an objective, time-tested analysis of mental, emotional, and physical alignment between partners.
+        </p>
+
+        <div class="p-4 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--line)] space-y-2">
+          <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Technical Specification</p>
+          <p class="text-sm text-[var(--ink)] leading-relaxed">
+            All calculations are performed utilizing high-precision planetary algorithms based on the <strong>sidereal zodiac</strong> and the <strong>Lahiri ayanamsha</strong> (Chitra Paksha) to ensure accurate Nakshatra and Pada determinations.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Form Card -->
+      <div class="lg:col-span-7">
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 sm:p-8 shadow-sm">
+          <h2 class="text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-6 text-center lg:text-left">
+            Enter Birth Details
+          </h2>
+          
+          <form class="space-y-6">
+            <!-- Grid for Boy and Girl columns -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
+              
+              <!-- Column 1: Boy's Details -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-[var(--line)]">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[var(--accent)]"></span>
+                  <h3 class="text-md font-semibold text-[var(--ink)]">Partner 1 (Boy)</h3>
+                </div>
+                
+                <div>
+                  <label for="boy-name" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Name</label>
+                  <input type="text" id="boy-name" name="boy-name" placeholder="Enter full name" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="boy-dob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Date of Birth</label>
+                  <input type="date" id="boy-dob" name="boy-dob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="boy-tob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Time of Birth</label>
+                  <input type="time" id="boy-tob" name="boy-tob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="boy-pob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Place of Birth</label>
+                  <input type="text" id="boy-pob" name="boy-pob" placeholder="City, State, Country" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+              </div>
+
+              <!-- Column 2: Girl's Details -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-[var(--line)]">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[var(--accent)]"></span>
+                  <h3 class="text-md font-semibold text-[var(--ink)]">Partner 2 (Girl)</h3>
+                </div>
+                
+                <div>
+                  <label for="girl-name" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Name</label>
+                  <input type="text" id="girl-name" name="girl-name" placeholder="Enter full name" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="girl-dob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Date of Birth</label>
+                  <input type="date" id="girl-dob" name="girl-dob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="girl-tob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Time of Birth</label>
+                  <input type="time" id="girl-tob" name="girl-tob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="girl-pob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Place of Birth</label>
+                  <input type="text" id="girl-pob" name="girl-pob" placeholder="City, State, Country" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Submit Button and Privacy Note -->
+            <div class="pt-4 border-t border-[var(--line)] space-y-4">
+              <button type="submit" class="w-full py-3 px-6 text-sm font-semibold rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-ink)] hover:opacity-95 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 flex items-center justify-center gap-2">
+                Check compatibility
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+              
+              <p class="text-xs text-[var(--muted)] text-center">
+                Your privacy is respected. Birth details are processed solely for generating compatibility calculations and are not stored permanently.
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

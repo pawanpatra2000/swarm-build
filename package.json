@@ -1,0 +1,20 @@
+{
+  "name": "swarm-build",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plan a UI into sections, build every section in parallel with AI agents, and watch swarm cursors assemble the real page live.",
+  "type": "module",
+  "bin": {
+    "swarm-build": "src/server.mjs"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "record": "node tools/record.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "playwright": "^1.64.1"
+  }
+}

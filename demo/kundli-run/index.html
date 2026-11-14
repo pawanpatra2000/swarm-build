@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MyAstroLuck Kundli Matching</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:wght@400;500;600;700&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>:root{--bg:#faf7ef;--surface:#f4ecda;--ink:#1f1d1a;--muted:#5a5045;--accent:#a84219;--accent-ink:#f8f1e3;--accent-soft:#f3dcc9;--dark:#28234c;--dark-ink:#f8f1e3;--line:#e3dacb;--radius:14px;--font:'Inter',system-ui,sans-serif;--heading-font:'Fraunces',var(--font)}
+html{scroll-behavior:smooth}body{font-family:var(--font)}</style>
+</head>
+<body class="bg-[var(--bg)] text-[var(--ink)] antialiased">
+<section data-section="header-nav" id="header-nav" class="sticky top-0 z-50 w-full bg-[var(--surface)] border-b border-[var(--line)]">
+  <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between" aria-label="Global Navigation">
+    
+    <!-- Left: Brand Wordmark -->
+    <a href="#header-nav" class="flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-[var(--radius)]" aria-label="MyAstroLuck Home">
+      <svg class="w-6 h-6 text-[var(--accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3a9 9 0 1 0 9 9 9.75 9.75 0 0 0-.67-3.41" />
+        <path d="M12 3v9h9" />
+        <path d="M12 12 4 4" />
+        <circle cx="12" cy="12" r="2" fill="currentColor" />
+        <path d="m18 8 2-2" />
+        <path d="m14 4 1-3" />
+      </svg>
+      <span class="font-[family-name:var(--heading-font)] font-semibold text-lg tracking-wide text-[var(--ink)]">
+        MyAstro<span class="text-[var(--accent)]">Luck</span>
+      </span>
+    </a>
+
+    <!-- Center: Navigation Links -->
+    <div class="hidden md:flex items-center space-x-8">
+      <a href="#hero-form" class="text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200">
+        Kundli
+      </a>
+      <a href="#kootas-breakdown" class="text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200">
+        Matching
+      </a>
+      <a href="#score-interpretation" class="text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200">
+        Panchang
+      </a>
+      <a href="#faq-accordion" class="text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200">
+        Horoscope
+      </a>
+    </div>
+
+    <!-- Right: Action Button & Mobile Menu Toggle -->
+    <div class="flex items-center gap-4">
+      <a href="#hero-form" class="inline-flex items-center justify-center px-5 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--accent-ink)] rounded-[var(--radius)] transition-transform duration-150 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2">
+        Match Now
+      </a>
+      
+      <!-- Mobile Menu Button (Decorative/Functional fallback) -->
+      <button type="button" class="md:hidden p-2 text-[var(--muted)] hover:text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-[var(--radius)]" aria-label="Toggle navigation menu" onclick="const menu = document.getElementById('mobile-menu'); menu.classList.toggle('hidden');">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Dropdown Menu -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-[var(--line)] bg-[var(--surface)] px-6 py-4 space-y-3">
+    <a href="#hero-form" class="block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1">
+      Kundli
+    </a>
+    <a href="#kootas-breakdown" class="block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1">
+      Matching
+    </a>
+    <a href="#score-interpretation" class="block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1">
+      Panchang
+    </a>
+    <a href="#faq-accordion" class="block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1">
+      Horoscope
+    </a>
+  </div>
+</section>
+<section data-section="hero-form" id="hero-form" class="relative bg-[var(--bg)] py-12 md:py-20 lg:py-24 border-b border-[var(--line)] overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      
+      <!-- Left Column: Copy & Explanation -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-sm font-medium">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          Traditional Vedic Astrology
+        </div>
+        
+        <h1 class="text-4xl lg:text-5xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)] leading-tight">
+          Analyze Compatibility Through the Ashtakoota System
+        </h1>
+        
+        <p class="text-lg text-[var(--muted)] leading-relaxed">
+          The traditional Vedic Kundli matching system evaluates compatibility across eight distinct dimensions, known as the Ashtakoota. By assessing 36 critical points (Gunas), it provides an objective, time-tested analysis of mental, emotional, and physical alignment between partners.
+        </p>
+
+        <div class="p-4 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--line)] space-y-2">
+          <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Technical Specification</p>
+          <p class="text-sm text-[var(--ink)] leading-relaxed">
+            All calculations are performed utilizing high-precision planetary algorithms based on the <strong>sidereal zodiac</strong> and the <strong>Lahiri ayanamsha</strong> (Chitra Paksha) to ensure accurate Nakshatra and Pada determinations.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Form Card -->
+      <div class="lg:col-span-7">
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 sm:p-8 shadow-sm">
+          <h2 class="text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-6 text-center lg:text-left">
+            Enter Birth Details
+          </h2>
+          
+          <form class="space-y-6">
+            <!-- Grid for Boy and Girl columns -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
+              
+              <!-- Column 1: Boy's Details -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-[var(--line)]">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[var(--accent)]"></span>
+                  <h3 class="text-md font-semibold text-[var(--ink)]">Partner 1 (Boy)</h3>
+                </div>
+                
+                <div>
+                  <label for="boy-name" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Name</label>
+                  <input type="text" id="boy-name" name="boy-name" placeholder="Enter full name" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="boy-dob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Date of Birth</label>
+                  <input type="date" id="boy-dob" name="boy-dob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="boy-tob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Time of Birth</label>
+                  <input type="time" id="boy-tob" name="boy-tob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="boy-pob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Place of Birth</label>
+                  <input type="text" id="boy-pob" name="boy-pob" placeholder="City, State, Country" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+              </div>
+
+              <!-- Column 2: Girl's Details -->
+              <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2 border-b border-[var(--line)]">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[var(--accent)]"></span>
+                  <h3 class="text-md font-semibold text-[var(--ink)]">Partner 2 (Girl)</h3>
+                </div>
+                
+                <div>
+                  <label for="girl-name" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Name</label>
+                  <input type="text" id="girl-name" name="girl-name" placeholder="Enter full name" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="girl-dob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Date of Birth</label>
+                  <input type="date" id="girl-dob" name="girl-dob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="girl-tob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Time of Birth</label>
+                  <input type="time" id="girl-tob" name="girl-tob" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+
+                <div>
+                  <label for="girl-pob" class="block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Place of Birth</label>
+                  <input type="text" id="girl-pob" name="girl-pob" placeholder="City, State, Country" required
+                    class="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm" />
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Submit Button and Privacy Note -->
+            <div class="pt-4 border-t border-[var(--line)] space-y-4">
+              <button type="submit" class="w-full py-3 px-6 text-sm font-semibold rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-ink)] hover:opacity-95 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 flex items-center justify-center gap-2">
+                Check compatibility
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+              
+              <p class="text-xs text-[var(--muted)] text-center">
+                Your privacy is respected. Birth details are processed solely for generating compatibility calculations and are not stored permanently.
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<section data-section="kootas-breakdown" id="kootas-breakdown" class="py-16 md:py-24 bg-[var(--bg)] border-b border-[var(--line)]">
+  <div class="max-w-6xl mx-auto px-6">
+    
+    <!-- Section Header -->
+    <div class="max-w-3xl mb-12">
+      <span class="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">Vedic Methodology</span>
+      <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-4 font-[family-name:var(--heading-font)] text-[var(--ink)]">
+        The Eight Kootas of Ashtakoota
+      </h2>
+      <p class="text-lg text-[var(--muted)] leading-relaxed">
+        Ashtakoota matching is a traditional, structured framework that analyzes compatibility across eight distinct dimensions. Each parameter carries a progressive weight, totaling 36 points.
+      </p>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Sidebar: 36 Points Summary -->
+      <div class="lg:col-span-4 bg-[var(--accent-soft)] border border-[var(--line)] rounded-[var(--radius)] p-6 md:p-8 sticky top-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-[var(--accent)] text-[var(--accent-ink)] rounded-[var(--radius)]">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold font-[family-name:var(--heading-font)] text-[var(--ink)]">
+            The 36-Point Scale
+          </h3>
+        </div>
+        
+        <p class="text-[var(--muted)] text-sm leading-relaxed mb-6">
+          The sum of all eight Kootas represents the total compatibility score of 36 Gunas. In Vedic tradition, a score of 18 or above indicates a balanced foundation for a harmonious partnership.
+        </p>
+
+        <div class="space-y-4">
+          <div class="flex justify-between items-center pb-3 border-b border-[var(--line)]">
+            <span class="text-sm font-medium text-[var(--ink)]">Maximum Score</span>
+            <span class="text-xl font-bold text-[var(--accent)]">36 Gunas</span>
+          </div>
+          <div class="flex justify-between items-center pb-3 border-b border-[var(--line)]">
+            <span class="text-sm font-medium text-[var(--ink)]">Minimum for Alignment</span>
+            <span class="text-sm font-semibold text-[var(--ink)]">18 Gunas</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-[var(--ink)]">Analytical Basis</span>
+            <span class="text-sm font-semibold text-[var(--ink)]">Lunar Constellations</span>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-[var(--line)]">
+          <p class="text-xs text-[var(--muted)] italic leading-normal">
+            Note: While a higher score indicates greater structural alignment, traditional astrologers also analyze individual planetary placements to provide a complete evaluation.
+          </p>
+        </div>
+      </div>
+
+      <!-- Kootas Grid -->
+      <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Card 1: Varna -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 1</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 1 Point</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Varna</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Assesses work compatibility, spiritual temperament, and the natural skills and capacities of both partners.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 2: Vashya -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 2</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 2 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Vashya</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Examines mutual dominance, emotional influence, and the power dynamic between partners to ensure balanced attraction.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 3: Tara -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 3</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 3 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Tara</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Analyzes birth star compatibility to indicate longevity, health, and mutual well-being throughout the partnership.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 4: Yoni -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 4</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 4 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Yoni</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Evaluates physical compatibility, intimate bonding, and biological harmony based on animal archetypes associated with birth stars.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 5: Graha Maitri -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 5</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 5 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Graha Maitri</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Measures mental compatibility, intellectual friendship, and the natural alignment of the planetary rulers of both moon signs.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 6: Gana -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 6</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 6 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Gana</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Determines temperament compatibility, classifying individuals into Deva (divine), Manushya (human), or Rakshasa (demon) groups.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 7: Bhakoot -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 7</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 7 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Bhakoot</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Analyzes emotional resonance, family welfare, and prosperity based on the relative position of the partners' zodiac signs.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 8: Nadi -->
+        <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200">
+          <div>
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Koota 8</span>
+              <span class="text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full">Max: 8 Points</span>
+            </div>
+            <h4 class="text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]">Nadi</h4>
+            <p class="text-sm text-[var(--muted)] leading-relaxed">
+              Evaluates genetic compatibility, physiological balance, and the health of future offspring, carrying the highest weight in compatibility.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+<section data-section="score-interpretation" id="score-interpretation" class="py-16 md:py-20 bg-[var(--bg)] border-b border-[var(--line)]">
+  <div class="max-w-6xl mx-auto px-6">
+    
+    <!-- Section Header -->
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)] mb-4">
+        Interpreting Your Compatibility Score
+      </h2>
+      <p class="text-lg text-[var(--muted)]">
+        The Ashtakoota system evaluates compatibility out of a maximum of 36 points (Gunas). Understanding the mathematical thresholds helps put your compatibility report into traditional perspective.
+      </p>
+    </div>
+
+    <!-- Score Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      
+      <!-- Card 1: 0-17 -->
+      <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm">
+        <div>
+          <div class="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-red-50 text-red-700 border border-red-100 mb-4">
+            Under Threshold
+          </div>
+          <h3 class="text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2">
+            0 – 17 Points
+          </h3>
+          <p class="text-sm text-[var(--muted)] leading-relaxed">
+            Generally not recommended for marriage under traditional Vedic standards. Indicates significant friction in core temperament, mental alignment, or health parameters.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]">
+          <span class="font-medium text-[var(--ink)]">Guidance:</span> Requires detailed chart review and specific remedies (Upayas) if proceeding.
+        </div>
+      </div>
+
+      <!-- Card 2: 18-24 -->
+      <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm">
+        <div>
+          <div class="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--line)] mb-4">
+            Acceptable
+          </div>
+          <h3 class="text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2">
+            18 – 24 Points
+          </h3>
+          <p class="text-sm text-[var(--muted)] leading-relaxed">
+            The baseline for a stable union. Indicates average, workable compatibility where mutual understanding, effort, and mature communication can successfully bridge natural differences.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]">
+          <span class="font-medium text-[var(--ink)]">Guidance:</span> Recommended for alliance, provided major individual doshas are absent.
+        </div>
+      </div>
+
+      <!-- Card 3: 25-32 -->
+      <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm">
+        <div>
+          <div class="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--line)] mb-4">
+            Very Good
+          </div>
+          <h3 class="text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2">
+            25 – 32 Points
+          </h3>
+          <p class="text-sm text-[var(--muted)] leading-relaxed">
+            Strong emotional, mental, and physical compatibility. Indicates high harmony, shared values, and a natural supportive alignment that fosters long-term mutual growth.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]">
+          <span class="font-medium text-[var(--ink)]">Guidance:</span> Highly recommended. Predicts a naturally cooperative and harmonious relationship.
+        </div>
+      </div>
+
+      <!-- Card 4: 33-36 -->
+      <div class="bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm">
+        <div>
+          <div class="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-[var(--accent)] text-[var(--accent-ink)] mb-4">
+            Excellent
+          </div>
+          <h3 class="text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2">
+            33 – 36 Points
+          </h3>
+          <p class="text-sm text-[var(--muted)] leading-relaxed">
+            An exceptional and rare alignment of core energies. Represents profound soul-level compatibility and near-perfect synchronization across almost all analytical parameters.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]">
+          <span class="font-medium text-[var(--ink)]">Guidance:</span> Outstanding compatibility. Rare configuration indicating seamless life path alignment.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Critical Dosha Note -->
+    <div class="bg-[var(--accent-soft)] border-l-4 border-[var(--accent)] rounded-r-[var(--radius)] p-6 md:p-8">
+      <div class="flex flex-col md:flex-row gap-4 items-start">
+        <div class="shrink-0 bg-[var(--accent)] text-[var(--accent-ink)] p-2 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-lg font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2">
+            Critical Analytical Note: Dosha Exclusions
+          </h4>
+          <p class="text-sm text-[var(--muted)] leading-relaxed">
+            While the numerical Guna score is a vital baseline, it represents only one facet of Vedic matching. Critical factors like <span class="font-semibold text-[var(--ink)]">Manglik Dosha</span> (Mars afflictions) and <span class="font-semibold text-[var(--ink)]">Nadi Dosha</span> (physiological/genetic incompatibility) are evaluated independently. A severe, uncompensated Nadi Dosha or an unmatched Manglik configuration can override a high Guna score. Comprehensive matching always cross-references the numerical score with these primary planetary placements.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<section data-section="faq-accordion" id="faq-accordion" class="py-16 md:py-24 bg-[var(--bg)] border-t border-[var(--line)]">
+  <div class="max-w-4xl mx-auto px-6">
+    
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+      <span class="text-xs font-semibold tracking-wider uppercase text-[var(--accent)] bg-[var(--accent-soft)] px-3 py-1 rounded-full">
+        Clarity &amp; Tradition
+      </span>
+      <h2 class="mt-4 text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)]">
+        Frequently Asked Questions
+      </h2>
+      <p class="mt-3 text-lg text-[var(--muted)] max-w-2xl mx-auto">
+        Vedic compatibility is an intricate science. Here are honest, precise answers to the most common inquiries regarding Kundli Matching and Guna Milan.
+      </p>
+    </div>
+
+    <!-- Accordion Container -->
+    <div class="space-y-4">
+      
+      <!-- FAQ Item 1 -->
+      <details class="group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300" open>
+        <summary class="flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none">
+          <span class="font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200">
+            Is this service completely free?
+          </span>
+          <span class="ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </span>
+        </summary>
+        <div class="px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4">
+          <p>
+            Yes. Our online Kundli Matching and Guna Milan tool is fully accessible without any hidden charges, subscriptions, or premium paywalls. We believe that foundational Vedic calculations should be freely available to anyone seeking clarity and alignment in their personal life choices.
+          </p>
+        </div>
+      </details>
+
+      <!-- FAQ Item 2 -->
+      <details class="group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300">
+        <summary class="flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none">
+          <span class="font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200">
+            What if I do not know my exact birth time?
+          </span>
+          <span class="ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </span>
+        </summary>
+        <div class="px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4">
+          <p>
+            An exact birth time ensures the most precise calculations for the Ascendant (Lagna) and the subtle divisional charts. If you do not know the exact minute, you can input a close estimate. However, even small discrepancies can shift the Moon's nakshatra quarters or modify the Navamsha chart. If high accuracy is desired, we recommend consulting a professional astrologer for a birth time rectification process.
+          </p>
+        </div>
+      </details>
+
+      <!-- FAQ Item 3 -->
+      <details class="group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300">
+        <summary class="flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none">
+          <span class="font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200">
+            Is guna milan sufficient on its own for marriage?
+          </span>
+          <span class="ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </span>
+        </summary>
+        <div class="px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4">
+          <p>
+            No. While Guna Milan (Ashta Koota) is a highly structured and reliable initial screening system based on the Moon's positions, it represents only one dimension of compatibility. A complete Vedic matching process also evaluates the strength of the Seventh House (marriage), the current planetary periods (Dashas), individual longevity, and the presence of severe planetary afflictions like Manglik Dosha.
+          </p>
+        </div>
+      </details>
+
+      <!-- FAQ Item 4 -->
+      <details class="group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300">
+        <summary class="flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none">
+          <span class="font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200">
+            What is Nadi dosha and why does it matter?
+          </span>
+          <span class="ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </span>
+        </summary>
+        <div class="px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4">
+          <p>
+            Nadi represents the physiological and psychological constitution (classified into Adi, Madhya, and Antya, similar to the Ayurvedic humors of Vata, Pitta, and Kapha). A Nadi Dosha occurs when both partners share the same Nadi classification. In Vedic astrology, this is assigned the highest weight of 8 points because it traditionally indicates potential challenges in progeny, genetic compatibility, and long-term health harmony.
+          </p>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+<section data-section="footer-disclaimer" id="footer-disclaimer" class="bg-[var(--dark)] text-[var(--dark-ink)] py-12 md:py-16 border-t border-white/10">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-12">
+      
+      <!-- Brand and Disclaimer Column -->
+      <div class="lg:col-span-6 space-y-6">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-[var(--accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v18M3 12h18M12 3l4 4M12 3L8 7M12 21l4-4M12 21l-4-4M3 12l4 4M3 12l4-4M21 12l-4 4M21 12l-4-4"/>
+            <circle cx="12" cy="12" r="4" fill="currentColor" class="fill-current text-[var(--accent)]/20"/>
+          </svg>
+          <span class="text-xl font-bold tracking-wide font-[family-name:var(--heading-font)] text-white">MyAstroLuck</span>
+        </div>
+        
+        <div class="space-y-4">
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-white/90">Astrological Guidance Disclaimer</h3>
+          <p class="text-sm text-white/70 leading-relaxed">
+            MyAstroLuck provides Kundli matching and Vedic astrological analysis as an interpretive tool for self-reflection and personal insight. Astrology is an ancient analytical framework based on planetary positions; it does not constitute binding psychological, medical, legal, or financial advice. 
+          </p>
+          <p class="text-sm text-white/70 leading-relaxed">
+            We do not guarantee specific life, relationship, or compatibility outcomes. Human agency, mutual effort, and conscious choices remain the primary determinants of any relationship's success.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Links Column -->
+      <div class="lg:col-span-3 lg:col-start-8 space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-white/90">Navigation</h3>
+        <nav aria-label="Footer Navigation">
+          <ul class="space-y-2.5 text-sm">
+            <li>
+              <a href="#header-nav" class="text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5">
+                Top of Page
+              </a>
+            </li>
+            <li>
+              <a href="#hero-form" class="text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5">
+                Kundli Matching Form
+              </a>
+            </li>
+            <li>
+              <a href="#kootas-breakdown" class="text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5">
+                The Eight Kootas
+              </a>
+            </li>
+            <li>
+              <a href="#score-interpretation" class="text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5">
+                Score Guide
+              </a>
+            </li>
+            <li>
+              <a href="#faq-accordion" class="text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5">
+                Frequently Asked Questions
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Methodology Column -->
+      <div class="lg:col-span-2 space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-white/90">Our Approach</h3>
+        <p class="text-sm text-white/70 leading-relaxed">
+          Rooted in the traditional Ashtakoota system, we focus on mathematical precision and classical Vedic principles, presenting cosmic alignments with clarity and respect for individual pathfinding.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
+      <div>
+        <p>&copy; 2026 MyAstroLuck. All rights reserved. Calculated using high-precision astronomical ephemeris.</p>
+      </div>
+      <div class="flex gap-6">
+        <span class="hover:text-white transition-colors cursor-default">Privacy Policy</span>
+        <span class="hover:text-white transition-colors cursor-default">Terms of Service</span>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+  "title": "MyAstroLuck Kundli Matching",
+  "theme": {
+    "bg": "#faf7ef",
+    "surface": "#f4ecda",
+    "ink": "#1f1d1a",
+    "muted": "#5a5045",
+    "accent": "#a84219",
+    "accentInk": "#f8f1e3",
+    "accentSoft": "#f3dcc9",
+    "dark": "#28234c",
+    "darkInk": "#f8f1e3",
+    "line": "#e3dacb",
+    "radius": "14px",
+    "font": "Inter",
+    "headingFont": "Fraunces"
+  },
+  "voice": "Warm, calm, and precise, presenting Vedic astrology as a traditional analytical system without sensationalism or exaggerated promises.",
+  "sections": [
+    {
+      "id": "header-nav",
+      "name": "Navigation Header",
+      "brief": "A clean, elegant header containing the MyAstroLuck wordmark on the left, centered navigation links for 'Kundli', 'Matching', 'Panchang', and 'Horoscope', and a prominent 'Match now' button styled in the accent color on the right. The layout should be a single row with a subtle bottom border.",
+      "height": "short"
+    },
+    {
+      "id": "hero-form",
+      "name": "Vedic Matching Form",
+      "brief": "A split-screen hero section. The left side features a calm headline about checking compatibility the Vedic way, a one-line explanation of the Ashtakoota (36 gunas) system, and a small note that calculations use the sidereal zodiac and Lahiri ayanamsha. The right side features a white card containing a two-column form (labeled 'Boy' and 'Girl') with fields for Name, Date of Birth, Time of Birth, and Place of Birth, ending with a full-width 'Check compatibility' button in the accent color.",
+      "height": "tall"
+    },
+    {
+      "id": "kootas-breakdown",
+      "name": "The Eight Kootas Explained",
+      "brief": "A structured grid displaying the 8 kootas of Ashtakoota matching. Each of the 8 cards (Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi) must display its name, its maximum point value (1 to 8 respectively), and a plain, single-sentence explanation of what it checks. Include a prominent sidebar or header banner showing that these sum to a total of 36 points.",
+      "height": "medium"
+    },
+    {
+      "id": "score-interpretation",
+      "name": "Score Interpretation Guide",
+      "brief": "A visually intuitive horizontal band or grid displaying the four score ranges: 0-17 (not recommended without remedies), 18-24 (average, acceptable), 25-32 (very good), and 33-36 (excellent). Use the surface color for cards and accent highlights to differentiate the bands. Include a clear, separate note explaining that Manglik dosha and Nadi dosha are critical factors checked independently of the gunas.",
+      "height": "medium"
+    },
+    {
+      "id": "faq-accordion",
+      "name": "Frequently Asked Questions",
+      "brief": "An accordion-style FAQ section featuring exactly four questions: 'Is this service completely free?', 'What if I do not know my exact birth time?', 'Is guna milan sufficient on its own for marriage?', and 'What is Nadi dosha and why does it matter?'. Answers must be honest, clear, and written in a calm, grounded tone.",
+      "height": "medium"
+    },
+    {
+      "id": "footer-disclaimer",
+      "name": "Footer & Disclaimer",
+      "brief": "A deep contrast footer using the dark band background color. It must contain site links, copyright 2026 MyAstroLuck, and a prominent disclaimer stating that MyAstroLuck provides astrological guidance for personal reflection and does not guarantee specific life or relationship outcomes.",
+      "height": "short"
+    }
+  ]
+}

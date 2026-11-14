@@ -1,0 +1,1260 @@
+{
+  "brief": "Landing page for MyAstroLuck Kundli Matching, a free Vedic horoscope matching tool for couples and families in India.\n\nWhat the page must cover:\n- Header: MyAstroLuck wordmark, nav links (Kundli, Matching, Panchang, Horoscope), a \"Match now\" button.\n- Hero: headline about checking compatibility the Vedic way, one-line explanation of Ashtakoota (36 gunas), and a matching form preview with two columns (boy and girl: name, date of birth, time of birth, place of birth) and a \"Check compatibility\" button. Note that results are calculated with the sidereal zodiac and Lahiri ayanamsha.\n- The 8 kootas explained: Varna (1), Vashya (2), Tara (3), Yoni (4), Graha Maitri (5), Gana (6), Bhakoot (7), Nadi (8), each with its points and one plain sentence on what it checks. Show the total of 36.\n- How to read the score: bands 0-17 (not recommended without remedies), 18-24 (average, acceptable), 25-32 (very good), 33-36 (excellent), plus a short note that Manglik dosha and Nadi dosha are checked separately.\n- FAQ: 4 questions (is it free, what if I do not know birth time, is guna milan enough on its own, what is Nadi dosha) with short honest answers.\n- Footer: links, a line that MyAstroLuck gives guidance and not guarantees, copyright 2026.\n\nBrand (use exactly): page background #faf7ef, surface #f4ecda, cards #ffffff, ink #1f1d1a, muted text #5a5045, rules #e3dacb, accent (terracotta) #a84219, accent text on accent #f8f1e3, pale accent tint #f3dcc9, dark band #28234c with text #f8f1e3. Radius 14px. Body font \"Inter\", heading font \"Fraunces\". Tone: warm, calm, precise, no hype. No testimonials, no ratings, no user counts.",
+  "stats": {
+    "wallMs": 23843,
+    "planMs": 9319,
+    "buildWallMs": 14524,
+    "sumMs": 70256,
+    "speedup": 4.84,
+    "sections": 6,
+    "failed": 0,
+    "tokens": {
+      "in": 4290,
+      "out": 19255
+    },
+    "costUsd": 0.1797,
+    "outDir": "/Users/pp/Documents/GitHub/swarm-build/out/myastroluck-kundli-matching-2026-11-14165820",
+    "model": "gemini-3.5-flash"
+  },
+  "events": [
+    {
+      "t": 0,
+      "type": "meta",
+      "brief": "Landing page for MyAstroLuck Kundli Matching, a free Vedic horoscope matching tool for couples and families in India.\n\nWhat the page must cover:\n- Header: MyAstroLuck wordmark, nav links (Kundli, Matching, Panchang, Horoscope), a \"Match now\" button.\n- Hero: headline about checking compatibility the Vedic way, one-line explanation of Ashtakoota (36 gunas), and a matching form preview with two columns (boy and girl: name, date of birth, time of birth, place of birth) and a \"Check compatibility\" button. Note that results are calculated with the sidereal zodiac and Lahiri ayanamsha.\n- The 8 kootas explained: Varna (1), Vashya (2), Tara (3), Yoni (4), Graha Maitri (5), Gana (6), Bhakoot (7), Nadi (8), each with its points and one plain sentence on what it checks. Show the total of 36.\n- How to read the score: bands 0-17 (not recommended without remedies), 18-24 (average, acceptable), 25-32 (very good), 33-36 (excellent), plus a short note that Manglik dosha and Nadi dosha are checked separately.\n- FAQ: 4 questions (is it free, what if I do not know birth time, is guna milan enough on its own, what is Nadi dosha) with short honest answers.\n- Footer: links, a line that MyAstroLuck gives guidance and not guarantees, copyright 2026.\n\nBrand (use exactly): page background #faf7ef, surface #f4ecda, cards #ffffff, ink #1f1d1a, muted text #5a5045, rules #e3dacb, accent (terracotta) #a84219, accent text on accent #f8f1e3, pale accent tint #f3dcc9, dark band #28234c with text #f8f1e3. Radius 14px. Body font \"Inter\", heading font \"Fraunces\". Tone: warm, calm, precise, no hype. No testimonials, no ratings, no user counts.",
+      "model": "gemini-3.5-flash",
+      "agents": [
+        {
+          "name": "Ada",
+          "color": "#e4572e"
+        },
+        {
+          "name": "Linus",
+          "color": "#2e86ab"
+        },
+        {
+          "name": "Grace",
+          "color": "#7b2cbf"
+        },
+        {
+          "name": "Alan",
+          "color": "#2a9d8f"
+        },
+        {
+          "name": "Margaret",
+          "color": "#d4a017"
+        },
+        {
+          "name": "Dennis",
+          "color": "#c2185b"
+        }
+      ]
+    },
+    {
+      "t": 0,
+      "type": "plan:start"
+    },
+    {
+      "t": 9319,
+      "type": "plan:done",
+      "plan": {
+        "title": "MyAstroLuck Kundli Matching",
+        "theme": {
+          "bg": "#faf7ef",
+          "surface": "#f4ecda",
+          "ink": "#1f1d1a",
+          "muted": "#5a5045",
+          "accent": "#a84219",
+          "accentInk": "#f8f1e3",
+          "accentSoft": "#f3dcc9",
+          "dark": "#28234c",
+          "darkInk": "#f8f1e3",
+          "line": "#e3dacb",
+          "radius": "14px",
+          "font": "Inter",
+          "headingFont": "Fraunces"
+        },
+        "voice": "Warm, calm, and precise, presenting Vedic astrology as a traditional analytical system without sensationalism or exaggerated promises.",
+        "sections": [
+          {
+            "id": "header-nav",
+            "name": "Navigation Header",
+            "brief": "A clean, elegant header containing the MyAstroLuck wordmark on the left, centered navigation links for 'Kundli', 'Matching', 'Panchang', and 'Horoscope', and a prominent 'Match now' button styled in the accent color on the right. The layout should be a single row with a subtle bottom border.",
+            "height": "short"
+          },
+          {
+            "id": "hero-form",
+            "name": "Vedic Matching Form",
+            "brief": "A split-screen hero section. The left side features a calm headline about checking compatibility the Vedic way, a one-line explanation of the Ashtakoota (36 gunas) system, and a small note that calculations use the sidereal zodiac and Lahiri ayanamsha. The right side features a white card containing a two-column form (labeled 'Boy' and 'Girl') with fields for Name, Date of Birth, Time of Birth, and Place of Birth, ending with a full-width 'Check compatibility' button in the accent color.",
+            "height": "tall"
+          },
+          {
+            "id": "kootas-breakdown",
+            "name": "The Eight Kootas Explained",
+            "brief": "A structured grid displaying the 8 kootas of Ashtakoota matching. Each of the 8 cards (Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi) must display its name, its maximum point value (1 to 8 respectively), and a plain, single-sentence explanation of what it checks. Include a prominent sidebar or header banner showing that these sum to a total of 36 points.",
+            "height": "medium"
+          },
+          {
+            "id": "score-interpretation",
+            "name": "Score Interpretation Guide",
+            "brief": "A visually intuitive horizontal band or grid displaying the four score ranges: 0-17 (not recommended without remedies), 18-24 (average, acceptable), 25-32 (very good), and 33-36 (excellent). Use the surface color for cards and accent highlights to differentiate the bands. Include a clear, separate note explaining that Manglik dosha and Nadi dosha are critical factors checked independently of the gunas.",
+            "height": "medium"
+          },
+          {
+            "id": "faq-accordion",
+            "name": "Frequently Asked Questions",
+            "brief": "An accordion-style FAQ section featuring exactly four questions: 'Is this service completely free?', 'What if I do not know my exact birth time?', 'Is guna milan sufficient on its own for marriage?', and 'What is Nadi dosha and why does it matter?'. Answers must be honest, clear, and written in a calm, grounded tone.",
+            "height": "medium"
+          },
+          {
+            "id": "footer-disclaimer",
+            "name": "Footer & Disclaimer",
+            "brief": "A deep contrast footer using the dark band background color. It must contain site links, copyright 2026 MyAstroLuck, and a prominent disclaimer stating that MyAstroLuck provides astrological guidance for personal reflection and does not guarantee specific life or relationship outcomes.",
+            "height": "short"
+          }
+        ]
+      },
+      "ms": 9319,
+      "cost": {
+        "in": 755,
+        "out": 1629,
+        "usd": 0.0157935
+      }
+    },
+    {
+      "t": 9320,
+      "type": "agent:start",
+      "id": "header-nav",
+      "agent": {
+        "name": "Ada",
+        "color": "#e4572e"
+      }
+    },
+    {
+      "t": 9320,
+      "type": "agent:start",
+      "id": "hero-form",
+      "agent": {
+        "name": "Linus",
+        "color": "#2e86ab"
+      }
+    },
+    {
+      "t": 9321,
+      "type": "agent:start",
+      "id": "kootas-breakdown",
+      "agent": {
+        "name": "Grace",
+        "color": "#7b2cbf"
+      }
+    },
+    {
+      "t": 9321,
+      "type": "agent:start",
+      "id": "score-interpretation",
+      "agent": {
+        "name": "Alan",
+        "color": "#2a9d8f"
+      }
+    },
+    {
+      "t": 9321,
+      "type": "agent:start",
+      "id": "faq-accordion",
+      "agent": {
+        "name": "Margaret",
+        "color": "#d4a017"
+      }
+    },
+    {
+      "t": 9321,
+      "type": "agent:start",
+      "id": "footer-disclaimer",
+      "agent": {
+        "name": "Dennis",
+        "color": "#c2185b"
+      }
+    },
+    {
+      "t": 12631,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 70
+    },
+    {
+      "t": 12868,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 250
+    },
+    {
+      "t": 13015,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 49
+    },
+    {
+      "t": 13089,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 469
+    },
+    {
+      "t": 13248,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 198
+    },
+    {
+      "t": 13393,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 622
+    },
+    {
+      "t": 13590,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 428
+    },
+    {
+      "t": 13594,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 50
+    },
+    {
+      "t": 13632,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 698
+    },
+    {
+      "t": 13811,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 274
+    },
+    {
+      "t": 13974,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 669
+    },
+    {
+      "t": 13976,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 30
+    },
+    {
+      "t": 13977,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 921
+    },
+    {
+      "t": 14063,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 504
+    },
+    {
+      "t": 14226,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 725
+    },
+    {
+      "t": 14228,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 264
+    },
+    {
+      "t": 14260,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 1218
+    },
+    {
+      "t": 14288,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 665
+    },
+    {
+      "t": 14429,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 334
+    },
+    {
+      "t": 14442,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 752
+    },
+    {
+      "t": 14488,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 1360
+    },
+    {
+      "t": 14489,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 690
+    },
+    {
+      "t": 14648,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 638
+    },
+    {
+      "t": 14723,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 1584
+    },
+    {
+      "t": 14730,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 851
+    },
+    {
+      "t": 14740,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 926
+    },
+    {
+      "t": 14877,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 836
+    },
+    {
+      "t": 14941,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 1847
+    },
+    {
+      "t": 14942,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 1068
+    },
+    {
+      "t": 15089,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 931
+    },
+    {
+      "t": 15100,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 28
+    },
+    {
+      "t": 15259,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 1932
+    },
+    {
+      "t": 15327,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 1089
+    },
+    {
+      "t": 15333,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 1105
+    },
+    {
+      "t": 15336,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 1375
+    },
+    {
+      "t": 15345,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 147
+    },
+    {
+      "t": 15491,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 2464
+    },
+    {
+      "t": 15557,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 557
+    },
+    {
+      "t": 15570,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 1744
+    },
+    {
+      "t": 15577,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 1794
+    },
+    {
+      "t": 15650,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 1432
+    },
+    {
+      "t": 15722,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 2687
+    },
+    {
+      "t": 15810,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 2103
+    },
+    {
+      "t": 15810,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 879
+    },
+    {
+      "t": 15830,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 2065
+    },
+    {
+      "t": 15931,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 3030
+    },
+    {
+      "t": 15952,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 1793
+    },
+    {
+      "t": 16052,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 2234
+    },
+    {
+      "t": 16052,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 1138
+    },
+    {
+      "t": 16059,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 2402
+    },
+    {
+      "t": 16142,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 3326
+    },
+    {
+      "t": 16170,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 1982
+    },
+    {
+      "t": 16262,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 2541
+    },
+    {
+      "t": 16268,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 1333
+    },
+    {
+      "t": 16327,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 2709
+    },
+    {
+      "t": 16393,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 2175
+    },
+    {
+      "t": 16398,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 27
+    },
+    {
+      "t": 16410,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 3617
+    },
+    {
+      "t": 16480,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 2795
+    },
+    {
+      "t": 16501,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 1486
+    },
+    {
+      "t": 16577,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 2977
+    },
+    {
+      "t": 16597,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 2377
+    },
+    {
+      "t": 16712,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 245
+    },
+    {
+      "t": 16734,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 1610
+    },
+    {
+      "t": 16736,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 3902
+    },
+    {
+      "t": 16737,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 2933
+    },
+    {
+      "t": 16789,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 3285
+    },
+    {
+      "t": 16814,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 2527
+    },
+    {
+      "t": 16922,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 423
+    },
+    {
+      "t": 16942,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 1910
+    },
+    {
+      "t": 16943,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 3084
+    },
+    {
+      "t": 16954,
+      "type": "agent:progress",
+      "id": "footer-disclaimer",
+      "chars": 4206
+    },
+    {
+      "t": 17032,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 2799
+    },
+    {
+      "t": 17078,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 3579
+    },
+    {
+      "t": 17122,
+      "type": "agent:done",
+      "id": "footer-disclaimer",
+      "html": "<section data-section=\"footer-disclaimer\" id=\"footer-disclaimer\" class=\"bg-[var(--dark)] text-[var(--dark-ink)] py-12 md:py-16 border-t border-white/10\">\n  <div class=\"max-w-6xl mx-auto px-6\">\n    <div class=\"grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-12\">\n      \n      <!-- Brand and Disclaimer Column -->\n      <div class=\"lg:col-span-6 space-y-6\">\n        <div class=\"flex items-center gap-3\">\n          <svg class=\"w-8 h-8 text-[var(--accent)]\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\n            <path d=\"M12 3v18M3 12h18M12 3l4 4M12 3L8 7M12 21l4-4M12 21l-4-4M3 12l4 4M3 12l4-4M21 12l-4 4M21 12l-4-4\"/>\n            <circle cx=\"12\" cy=\"12\" r=\"4\" fill=\"currentColor\" class=\"fill-current text-[var(--accent)]/20\"/>\n          </svg>\n          <span class=\"text-xl font-bold tracking-wide font-[family-name:var(--heading-font)] text-white\">MyAstroLuck</span>\n        </div>\n        \n        <div class=\"space-y-4\">\n          <h3 class=\"text-sm font-semibold uppercase tracking-wider text-white/90\">Astrological Guidance Disclaimer</h3>\n          <p class=\"text-sm text-white/70 leading-relaxed\">\n            MyAstroLuck provides Kundli matching and Vedic astrological analysis as an interpretive tool for self-reflection and personal insight. Astrology is an ancient analytical framework based on planetary positions; it does not constitute binding psychological, medical, legal, or financial advice. \n          </p>\n          <p class=\"text-sm text-white/70 leading-relaxed\">\n            We do not guarantee specific life, relationship, or compatibility outcomes. Human agency, mutual effort, and conscious choices remain the primary determinants of any relationship's success.\n          </p>\n        </div>\n      </div>\n\n      <!-- Quick Links Column -->\n      <div class=\"lg:col-span-3 lg:col-start-8 space-y-4\">\n        <h3 class=\"text-sm font-semibold uppercase tracking-wider text-white/90\">Navigation</h3>\n        <nav aria-label=\"Footer Navigation\">\n          <ul class=\"space-y-2.5 text-sm\">\n            <li>\n              <a href=\"#header-nav\" class=\"text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5\">\n                Top of Page\n              </a>\n            </li>\n            <li>\n              <a href=\"#hero-form\" class=\"text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5\">\n                Kundli Matching Form\n              </a>\n            </li>\n            <li>\n              <a href=\"#kootas-breakdown\" class=\"text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5\">\n                The Eight Kootas\n              </a>\n            </li>\n            <li>\n              <a href=\"#score-interpretation\" class=\"text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5\">\n                Score Guide\n              </a>\n            </li>\n            <li>\n              <a href=\"#faq-accordion\" class=\"text-white/70 hover:text-[var(--accent)] transition-colors duration-200 block py-0.5\">\n                Frequently Asked Questions\n              </a>\n            </li>\n          </ul>\n        </nav>\n      </div>\n\n      <!-- Methodology Column -->\n      <div class=\"lg:col-span-2 space-y-4\">\n        <h3 class=\"text-sm font-semibold uppercase tracking-wider text-white/90\">Our Approach</h3>\n        <p class=\"text-sm text-white/70 leading-relaxed\">\n          Rooted in the traditional Ashtakoota system, we focus on mathematical precision and classical Vedic principles, presenting cosmic alignments with clarity and respect for individual pathfinding.\n        </p>\n      </div>\n\n    </div>\n\n    <!-- Divider -->\n    <div class=\"border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50\">\n      <div>\n        <p>&copy; 2026 MyAstroLuck. All rights reserved. Calculated using high-precision astronomical ephemeris.</p>\n      </div>\n      <div class=\"flex gap-6\">\n        <span class=\"hover:text-white transition-colors cursor-default\">Privacy Policy</span>\n        <span class=\"hover:text-white transition-colors cursor-default\">Terms of Service</span>\n      </div>\n    </div>\n  </div>\n</section>",
+      "ms": 7801,
+      "cost": {
+        "in": 559,
+        "out": 1705,
+        "usd": 0.0161835
+      },
+      "agent": {
+        "name": "Dennis",
+        "color": "#c2185b"
+      }
+    },
+    {
+      "t": 17188,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 3330
+    },
+    {
+      "t": 17220,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 651
+    },
+    {
+      "t": 17255,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 2203
+    },
+    {
+      "t": 17262,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 2964
+    },
+    {
+      "t": 17280,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 3879
+    },
+    {
+      "t": 17449,
+      "type": "agent:progress",
+      "id": "header-nav",
+      "chars": 3558
+    },
+    {
+      "t": 17479,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 3160
+    },
+    {
+      "t": 17526,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 980
+    },
+    {
+      "t": 17526,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 2580
+    },
+    {
+      "t": 17531,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 4114
+    },
+    {
+      "t": 17682,
+      "type": "agent:done",
+      "id": "header-nav",
+      "html": "<section data-section=\"header-nav\" id=\"header-nav\" class=\"sticky top-0 z-50 w-full bg-[var(--surface)] border-b border-[var(--line)]\">\n  <nav class=\"max-w-6xl mx-auto px-6 h-16 flex items-center justify-between\" aria-label=\"Global Navigation\">\n    \n    <!-- Left: Brand Wordmark -->\n    <a href=\"#header-nav\" class=\"flex items-center gap-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-[var(--radius)]\" aria-label=\"MyAstroLuck Home\">\n      <svg class=\"w-6 h-6 text-[var(--accent)]\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\n        <path d=\"M12 3a9 9 0 1 0 9 9 9.75 9.75 0 0 0-.67-3.41\" />\n        <path d=\"M12 3v9h9\" />\n        <path d=\"M12 12 4 4\" />\n        <circle cx=\"12\" cy=\"12\" r=\"2\" fill=\"currentColor\" />\n        <path d=\"m18 8 2-2\" />\n        <path d=\"m14 4 1-3\" />\n      </svg>\n      <span class=\"font-[family-name:var(--heading-font)] font-semibold text-lg tracking-wide text-[var(--ink)]\">\n        MyAstro<span class=\"text-[var(--accent)]\">Luck</span>\n      </span>\n    </a>\n\n    <!-- Center: Navigation Links -->\n    <div class=\"hidden md:flex items-center space-x-8\">\n      <a href=\"#hero-form\" class=\"text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200\">\n        Kundli\n      </a>\n      <a href=\"#kootas-breakdown\" class=\"text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200\">\n        Matching\n      </a>\n      <a href=\"#score-interpretation\" class=\"text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200\">\n        Panchang\n      </a>\n      <a href=\"#faq-accordion\" class=\"text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] transition-colors duration-200\">\n        Horoscope\n      </a>\n    </div>\n\n    <!-- Right: Action Button & Mobile Menu Toggle -->\n    <div class=\"flex items-center gap-4\">\n      <a href=\"#hero-form\" class=\"inline-flex items-center justify-center px-5 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--accent-ink)] rounded-[var(--radius)] transition-transform duration-150 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2\">\n        Match Now\n      </a>\n      \n      <!-- Mobile Menu Button (Decorative/Functional fallback) -->\n      <button type=\"button\" class=\"md:hidden p-2 text-[var(--muted)] hover:text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-[var(--radius)]\" aria-label=\"Toggle navigation menu\" onclick=\"const menu = document.getElementById('mobile-menu'); menu.classList.toggle('hidden');\">\n        <svg class=\"w-6 h-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n          <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h16M4 12h16M4 18h16\" />\n        </svg>\n      </button>\n    </div>\n  </nav>\n\n  <!-- Mobile Dropdown Menu -->\n  <div id=\"mobile-menu\" class=\"hidden md:hidden border-t border-[var(--line)] bg-[var(--surface)] px-6 py-4 space-y-3\">\n    <a href=\"#hero-form\" class=\"block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1\">\n      Kundli\n    </a>\n    <a href=\"#kootas-breakdown\" class=\"block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1\">\n      Matching\n    </a>\n    <a href=\"#score-interpretation\" class=\"block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1\">\n      Panchang\n    </a>\n    <a href=\"#faq-accordion\" class=\"block text-sm font-medium text-[var(--muted)] hover:text-[var(--ink)] py-1\">\n      Horoscope\n    </a>\n  </div>\n</section>",
+      "ms": 8362,
+      "cost": {
+        "in": 571,
+        "out": 2249,
+        "usd": 0.0210975
+      },
+      "agent": {
+        "name": "Ada",
+        "color": "#e4572e"
+      }
+    },
+    {
+      "t": 17686,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 3340
+    },
+    {
+      "t": 17775,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 2988
+    },
+    {
+      "t": 17793,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 4428
+    },
+    {
+      "t": 17795,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 1296
+    },
+    {
+      "t": 17902,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 3521
+    },
+    {
+      "t": 18039,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 1519
+    },
+    {
+      "t": 18065,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 4705
+    },
+    {
+      "t": 18069,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 3278
+    },
+    {
+      "t": 18213,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 3677
+    },
+    {
+      "t": 18255,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 1666
+    },
+    {
+      "t": 18431,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 4957
+    },
+    {
+      "t": 18434,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 3645
+    },
+    {
+      "t": 18435,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 3923
+    },
+    {
+      "t": 18587,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 1817
+    },
+    {
+      "t": 18656,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 3932
+    },
+    {
+      "t": 18656,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 5328
+    },
+    {
+      "t": 18702,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 4208
+    },
+    {
+      "t": 18802,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 2005
+    },
+    {
+      "t": 18881,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 4349
+    },
+    {
+      "t": 18892,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 5609
+    },
+    {
+      "t": 19071,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 4478
+    },
+    {
+      "t": 19129,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 4626
+    },
+    {
+      "t": 19131,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 5779
+    },
+    {
+      "t": 19189,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 2422
+    },
+    {
+      "t": 19335,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 5963
+    },
+    {
+      "t": 19335,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 4648
+    },
+    {
+      "t": 19335,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 4944
+    },
+    {
+      "t": 19479,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 2674
+    },
+    {
+      "t": 19582,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 5361
+    },
+    {
+      "t": 19584,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 5000
+    },
+    {
+      "t": 19589,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 6326
+    },
+    {
+      "t": 19910,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 5705
+    },
+    {
+      "t": 19911,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 2927
+    },
+    {
+      "t": 19947,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 5170
+    },
+    {
+      "t": 19959,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 6621
+    },
+    {
+      "t": 20195,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 3226
+    },
+    {
+      "t": 20196,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 6959
+    },
+    {
+      "t": 20198,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 6455
+    },
+    {
+      "t": 20206,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 5562
+    },
+    {
+      "t": 20466,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 6772
+    },
+    {
+      "t": 20468,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 7255
+    },
+    {
+      "t": 20468,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 3579
+    },
+    {
+      "t": 20469,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 5685
+    },
+    {
+      "t": 20678,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 7211
+    },
+    {
+      "t": 20774,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 7684
+    },
+    {
+      "t": 20775,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 3939
+    },
+    {
+      "t": 20776,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 5802
+    },
+    {
+      "t": 20936,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 7557
+    },
+    {
+      "t": 21037,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 4210
+    },
+    {
+      "t": 21042,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 8019
+    },
+    {
+      "t": 21142,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 7823
+    },
+    {
+      "t": 21152,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 5855
+    },
+    {
+      "t": 21300,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 4445
+    },
+    {
+      "t": 21334,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 8288
+    },
+    {
+      "t": 21381,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 8247
+    },
+    {
+      "t": 21560,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 6024
+    },
+    {
+      "t": 21568,
+      "type": "agent:progress",
+      "id": "hero-form",
+      "chars": 8500
+    },
+    {
+      "t": 21584,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 4659
+    },
+    {
+      "t": 21630,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 8592
+    },
+    {
+      "t": 21777,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 6222
+    },
+    {
+      "t": 21785,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 4804
+    },
+    {
+      "t": 21819,
+      "type": "agent:done",
+      "id": "hero-form",
+      "html": "<section data-section=\"hero-form\" id=\"hero-form\" class=\"relative bg-[var(--bg)] py-12 md:py-20 lg:py-24 border-b border-[var(--line)] overflow-hidden\">\n  <div class=\"max-w-6xl mx-auto px-6 relative z-10\">\n    <div class=\"grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center\">\n      \n      <!-- Left Column: Copy & Explanation -->\n      <div class=\"lg:col-span-5 space-y-6\">\n        <div class=\"inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-sm font-medium\">\n          <svg class=\"w-4 h-4\" fill=\"currentColor\" viewBox=\"0 0 20 20\" aria-hidden=\"true\">\n            <path d=\"M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z\" />\n          </svg>\n          Traditional Vedic Astrology\n        </div>\n        \n        <h1 class=\"text-4xl lg:text-5xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)] leading-tight\">\n          Analyze Compatibility Through the Ashtakoota System\n        </h1>\n        \n        <p class=\"text-lg text-[var(--muted)] leading-relaxed\">\n          The traditional Vedic Kundli matching system evaluates compatibility across eight distinct dimensions, known as the Ashtakoota. By assessing 36 critical points (Gunas), it provides an objective, time-tested analysis of mental, emotional, and physical alignment between partners.\n        </p>\n\n        <div class=\"p-4 rounded-[var(--radius)] bg-[var(--surface)] border border-[var(--line)] space-y-2\">\n          <p class=\"text-xs font-semibold uppercase tracking-wider text-[var(--muted)]\">Technical Specification</p>\n          <p class=\"text-sm text-[var(--ink)] leading-relaxed\">\n            All calculations are performed utilizing high-precision planetary algorithms based on the <strong>sidereal zodiac</strong> and the <strong>Lahiri ayanamsha</strong> (Chitra Paksha) to ensure accurate Nakshatra and Pada determinations.\n          </p>\n        </div>\n      </div>\n\n      <!-- Right Column: Form Card -->\n      <div class=\"lg:col-span-7\">\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 sm:p-8 shadow-sm\">\n          <h2 class=\"text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-6 text-center lg:text-left\">\n            Enter Birth Details\n          </h2>\n          \n          <form class=\"space-y-6\">\n            <!-- Grid for Boy and Girl columns -->\n            <div class=\"grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6\">\n              \n              <!-- Column 1: Boy's Details -->\n              <div class=\"space-y-4\">\n                <div class=\"flex items-center gap-2 pb-2 border-b border-[var(--line)]\">\n                  <span class=\"w-2.5 h-2.5 rounded-full bg-[var(--accent)]\"></span>\n                  <h3 class=\"text-md font-semibold text-[var(--ink)]\">Partner 1 (Boy)</h3>\n                </div>\n                \n                <div>\n                  <label for=\"boy-name\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Name</label>\n                  <input type=\"text\" id=\"boy-name\" name=\"boy-name\" placeholder=\"Enter full name\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n\n                <div>\n                  <label for=\"boy-dob\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Date of Birth</label>\n                  <input type=\"date\" id=\"boy-dob\" name=\"boy-dob\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n\n                <div>\n                  <label for=\"boy-tob\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Time of Birth</label>\n                  <input type=\"time\" id=\"boy-tob\" name=\"boy-tob\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n\n                <div>\n                  <label for=\"boy-pob\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Place of Birth</label>\n                  <input type=\"text\" id=\"boy-pob\" name=\"boy-pob\" placeholder=\"City, State, Country\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n              </div>\n\n              <!-- Column 2: Girl's Details -->\n              <div class=\"space-y-4\">\n                <div class=\"flex items-center gap-2 pb-2 border-b border-[var(--line)]\">\n                  <span class=\"w-2.5 h-2.5 rounded-full bg-[var(--accent)]\"></span>\n                  <h3 class=\"text-md font-semibold text-[var(--ink)]\">Partner 2 (Girl)</h3>\n                </div>\n                \n                <div>\n                  <label for=\"girl-name\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Name</label>\n                  <input type=\"text\" id=\"girl-name\" name=\"girl-name\" placeholder=\"Enter full name\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n\n                <div>\n                  <label for=\"girl-dob\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Date of Birth</label>\n                  <input type=\"date\" id=\"girl-dob\" name=\"girl-dob\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n\n                <div>\n                  <label for=\"girl-tob\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Time of Birth</label>\n                  <input type=\"time\" id=\"girl-tob\" name=\"girl-tob\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n\n                <div>\n                  <label for=\"girl-pob\" class=\"block text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1\">Place of Birth</label>\n                  <input type=\"text\" id=\"girl-pob\" name=\"girl-pob\" placeholder=\"City, State, Country\" required\n                    class=\"w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-[var(--radius)] text-[var(--ink)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-sm\" />\n                </div>\n              </div>\n\n            </div>\n\n            <!-- Submit Button and Privacy Note -->\n            <div class=\"pt-4 border-t border-[var(--line)] space-y-4\">\n              <button type=\"submit\" class=\"w-full py-3 px-6 text-sm font-semibold rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-ink)] hover:opacity-95 transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 flex items-center justify-center gap-2\">\n                Check compatibility\n                <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\" aria-hidden=\"true\">\n                  <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14 5l7 7m0 0l-7 7m7-7H3\" />\n                </svg>\n              </button>\n              \n              <p class=\"text-xs text-[var(--muted)] text-center\">\n                Your privacy is respected. Birth details are processed solely for generating compatibility calculations and are not stored permanently.\n              </p>\n            </div>\n          </form>\n        </div>\n      </div>\n\n    </div>\n  </div>\n</section>",
+      "ms": 12499,
+      "cost": {
+        "in": 618,
+        "out": 3286,
+        "usd": 0.030501
+      },
+      "agent": {
+        "name": "Linus",
+        "color": "#2e86ab"
+      }
+    },
+    {
+      "t": 21896,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 8973
+    },
+    {
+      "t": 21993,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 6469
+    },
+    {
+      "t": 22079,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 5210
+    },
+    {
+      "t": 22133,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 9337
+    },
+    {
+      "t": 22220,
+      "type": "agent:progress",
+      "id": "score-interpretation",
+      "chars": 6758
+    },
+    {
+      "t": 22287,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 5391
+    },
+    {
+      "t": 22334,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 9590
+    },
+    {
+      "t": 22414,
+      "type": "agent:done",
+      "id": "score-interpretation",
+      "html": "<section data-section=\"score-interpretation\" id=\"score-interpretation\" class=\"py-16 md:py-20 bg-[var(--bg)] border-b border-[var(--line)]\">\n  <div class=\"max-w-6xl mx-auto px-6\">\n    \n    <!-- Section Header -->\n    <div class=\"text-center max-w-3xl mx-auto mb-12\">\n      <h2 class=\"text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)] mb-4\">\n        Interpreting Your Compatibility Score\n      </h2>\n      <p class=\"text-lg text-[var(--muted)]\">\n        The Ashtakoota system evaluates compatibility out of a maximum of 36 points (Gunas). Understanding the mathematical thresholds helps put your compatibility report into traditional perspective.\n      </p>\n    </div>\n\n    <!-- Score Grid -->\n    <div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12\">\n      \n      <!-- Card 1: 0-17 -->\n      <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm\">\n        <div>\n          <div class=\"inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-red-50 text-red-700 border border-red-100 mb-4\">\n            Under Threshold\n          </div>\n          <h3 class=\"text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2\">\n            0 – 17 Points\n          </h3>\n          <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n            Generally not recommended for marriage under traditional Vedic standards. Indicates significant friction in core temperament, mental alignment, or health parameters.\n          </p>\n        </div>\n        <div class=\"mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]\">\n          <span class=\"font-medium text-[var(--ink)]\">Guidance:</span> Requires detailed chart review and specific remedies (Upayas) if proceeding.\n        </div>\n      </div>\n\n      <!-- Card 2: 18-24 -->\n      <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm\">\n        <div>\n          <div class=\"inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--line)] mb-4\">\n            Acceptable\n          </div>\n          <h3 class=\"text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2\">\n            18 – 24 Points\n          </h3>\n          <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n            The baseline for a stable union. Indicates average, workable compatibility where mutual understanding, effort, and mature communication can successfully bridge natural differences.\n          </p>\n        </div>\n        <div class=\"mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]\">\n          <span class=\"font-medium text-[var(--ink)]\">Guidance:</span> Recommended for alliance, provided major individual doshas are absent.\n        </div>\n      </div>\n\n      <!-- Card 3: 25-32 -->\n      <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm\">\n        <div>\n          <div class=\"inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--line)] mb-4\">\n            Very Good\n          </div>\n          <h3 class=\"text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2\">\n            25 – 32 Points\n          </h3>\n          <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n            Strong emotional, mental, and physical compatibility. Indicates high harmony, shared values, and a natural supportive alignment that fosters long-term mutual growth.\n          </p>\n        </div>\n        <div class=\"mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]\">\n          <span class=\"font-medium text-[var(--ink)]\">Guidance:</span> Highly recommended. Predicts a naturally cooperative and harmonious relationship.\n        </div>\n      </div>\n\n      <!-- Card 4: 33-36 -->\n      <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-6 flex flex-col justify-between transition-all hover:shadow-sm\">\n        <div>\n          <div class=\"inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-[var(--accent)] text-[var(--accent-ink)] mb-4\">\n            Excellent\n          </div>\n          <h3 class=\"text-2xl font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2\">\n            33 – 36 Points\n          </h3>\n          <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n            An exceptional and rare alignment of core energies. Represents profound soul-level compatibility and near-perfect synchronization across almost all analytical parameters.\n          </p>\n        </div>\n        <div class=\"mt-6 pt-4 border-t border-[var(--line)] text-xs text-[var(--muted)]\">\n          <span class=\"font-medium text-[var(--ink)]\">Guidance:</span> Outstanding compatibility. Rare configuration indicating seamless life path alignment.\n        </div>\n      </div>\n\n    </div>\n\n    <!-- Critical Dosha Note -->\n    <div class=\"bg-[var(--accent-soft)] border-l-4 border-[var(--accent)] rounded-r-[var(--radius)] p-6 md:p-8\">\n      <div class=\"flex flex-col md:flex-row gap-4 items-start\">\n        <div class=\"shrink-0 bg-[var(--accent)] text-[var(--accent-ink)] p-2 rounded-lg\">\n          <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z\"></path>\n          </svg>\n        </div>\n        <div>\n          <h4 class=\"text-lg font-bold text-[var(--ink)] font-[family-name:var(--heading-font)] mb-2\">\n            Critical Analytical Note: Dosha Exclusions\n          </h4>\n          <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n            While the numerical Guna score is a vital baseline, it represents only one facet of Vedic matching. Critical factors like <span class=\"font-semibold text-[var(--ink)]\">Manglik Dosha</span> (Mars afflictions) and <span class=\"font-semibold text-[var(--ink)]\">Nadi Dosha</span> (physiological/genetic incompatibility) are evaluated independently. A severe, uncompensated Nadi Dosha or an unmatched Manglik configuration can override a high Guna score. Comprehensive matching always cross-references the numerical score with these primary planetary placements.\n          </p>\n        </div>\n      </div>\n    </div>\n\n  </div>\n</section>",
+      "ms": 13093,
+      "cost": {
+        "in": 600,
+        "out": 2997,
+        "usd": 0.027873
+      },
+      "agent": {
+        "name": "Alan",
+        "color": "#2a9d8f"
+      }
+    },
+    {
+      "t": 22540,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 9908
+    },
+    {
+      "t": 22568,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 5658
+    },
+    {
+      "t": 22770,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 10271
+    },
+    {
+      "t": 22865,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 5896
+    },
+    {
+      "t": 23001,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 10579
+    },
+    {
+      "t": 23159,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 6098
+    },
+    {
+      "t": 23203,
+      "type": "agent:progress",
+      "id": "kootas-breakdown",
+      "chars": 10864
+    },
+    {
+      "t": 23313,
+      "type": "agent:done",
+      "id": "kootas-breakdown",
+      "html": "<section data-section=\"kootas-breakdown\" id=\"kootas-breakdown\" class=\"py-16 md:py-24 bg-[var(--bg)] border-b border-[var(--line)]\">\n  <div class=\"max-w-6xl mx-auto px-6\">\n    \n    <!-- Section Header -->\n    <div class=\"max-w-3xl mb-12\">\n      <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--accent)]\">Vedic Methodology</span>\n      <h2 class=\"text-3xl md:text-4xl font-bold mt-2 mb-4 font-[family-name:var(--heading-font)] text-[var(--ink)]\">\n        The Eight Kootas of Ashtakoota\n      </h2>\n      <p class=\"text-lg text-[var(--muted)] leading-relaxed\">\n        Ashtakoota matching is a traditional, structured framework that analyzes compatibility across eight distinct dimensions. Each parameter carries a progressive weight, totaling 36 points.\n      </p>\n    </div>\n\n    <!-- Main Layout Grid -->\n    <div class=\"grid grid-cols-1 lg:grid-cols-12 gap-8 items-start\">\n      \n      <!-- Sidebar: 36 Points Summary -->\n      <div class=\"lg:col-span-4 bg-[var(--accent-soft)] border border-[var(--line)] rounded-[var(--radius)] p-6 md:p-8 sticky top-6\">\n        <div class=\"flex items-center gap-3 mb-4\">\n          <div class=\"p-2 bg-[var(--accent)] text-[var(--accent-ink)] rounded-[var(--radius)]\">\n            <svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" class=\"w-6 h-6\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\" />\n            </svg>\n          </div>\n          <h3 class=\"text-xl font-bold font-[family-name:var(--heading-font)] text-[var(--ink)]\">\n            The 36-Point Scale\n          </h3>\n        </div>\n        \n        <p class=\"text-[var(--muted)] text-sm leading-relaxed mb-6\">\n          The sum of all eight Kootas represents the total compatibility score of 36 Gunas. In Vedic tradition, a score of 18 or above indicates a balanced foundation for a harmonious partnership.\n        </p>\n\n        <div class=\"space-y-4\">\n          <div class=\"flex justify-between items-center pb-3 border-b border-[var(--line)]\">\n            <span class=\"text-sm font-medium text-[var(--ink)]\">Maximum Score</span>\n            <span class=\"text-xl font-bold text-[var(--accent)]\">36 Gunas</span>\n          </div>\n          <div class=\"flex justify-between items-center pb-3 border-b border-[var(--line)]\">\n            <span class=\"text-sm font-medium text-[var(--ink)]\">Minimum for Alignment</span>\n            <span class=\"text-sm font-semibold text-[var(--ink)]\">18 Gunas</span>\n          </div>\n          <div class=\"flex justify-between items-center\">\n            <span class=\"text-sm font-medium text-[var(--ink)]\">Analytical Basis</span>\n            <span class=\"text-sm font-semibold text-[var(--ink)]\">Lunar Constellations</span>\n          </div>\n        </div>\n\n        <div class=\"mt-8 pt-6 border-t border-[var(--line)]\">\n          <p class=\"text-xs text-[var(--muted)] italic leading-normal\">\n            Note: While a higher score indicates greater structural alignment, traditional astrologers also analyze individual planetary placements to provide a complete evaluation.\n          </p>\n        </div>\n      </div>\n\n      <!-- Kootas Grid -->\n      <div class=\"lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4\">\n        \n        <!-- Card 1: Varna -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 1</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 1 Point</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Varna</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Assesses work compatibility, spiritual temperament, and the natural skills and capacities of both partners.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 2: Vashya -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 2</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 2 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Vashya</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Examines mutual dominance, emotional influence, and the power dynamic between partners to ensure balanced attraction.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 3: Tara -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 3</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 3 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Tara</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Analyzes birth star compatibility to indicate longevity, health, and mutual well-being throughout the partnership.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 4: Yoni -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 4</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 4 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Yoni</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Evaluates physical compatibility, intimate bonding, and biological harmony based on animal archetypes associated with birth stars.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 5: Graha Maitri -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 5</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 5 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Graha Maitri</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Measures mental compatibility, intellectual friendship, and the natural alignment of the planetary rulers of both moon signs.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 6: Gana -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 6</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 6 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Gana</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Determines temperament compatibility, classifying individuals into Deva (divine), Manushya (human), or Rakshasa (demon) groups.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 7: Bhakoot -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 7</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 7 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Bhakoot</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Analyzes emotional resonance, family welfare, and prosperity based on the relative position of the partners' zodiac signs.\n            </p>\n          </div>\n        </div>\n\n        <!-- Card 8: Nadi -->\n        <div class=\"bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] p-5 flex flex-col justify-between hover:border-[var(--accent)] transition-colors duration-200\">\n          <div>\n            <div class=\"flex justify-between items-start mb-3\">\n              <span class=\"text-xs font-bold uppercase tracking-wider text-[var(--muted)]\">Koota 8</span>\n              <span class=\"text-xs font-bold px-2 py-1 bg-[var(--accent-soft)] text-[var(--accent)] rounded-full\">Max: 8 Points</span>\n            </div>\n            <h4 class=\"text-lg font-bold mb-2 font-[family-name:var(--heading-font)] text-[var(--ink)]\">Nadi</h4>\n            <p class=\"text-sm text-[var(--muted)] leading-relaxed\">\n              Evaluates genetic compatibility, physiological balance, and the health of future offspring, carrying the highest weight in compatibility.\n            </p>\n          </div>\n        </div>\n\n      </div>\n\n    </div>\n  </div>\n</section>",
+      "ms": 13992,
+      "cost": {
+        "in": 610,
+        "out": 4165,
+        "usd": 0.0384
+      },
+      "agent": {
+        "name": "Grace",
+        "color": "#7b2cbf"
+      }
+    },
+    {
+      "t": 23374,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 6261
+    },
+    {
+      "t": 23657,
+      "type": "agent:progress",
+      "id": "faq-accordion",
+      "chars": 6674
+    },
+    {
+      "t": 23830,
+      "type": "agent:done",
+      "id": "faq-accordion",
+      "html": "<section data-section=\"faq-accordion\" id=\"faq-accordion\" class=\"py-16 md:py-24 bg-[var(--bg)] border-t border-[var(--line)]\">\n  <div class=\"max-w-4xl mx-auto px-6\">\n    \n    <!-- Section Header -->\n    <div class=\"text-center mb-12\">\n      <span class=\"text-xs font-semibold tracking-wider uppercase text-[var(--accent)] bg-[var(--accent-soft)] px-3 py-1 rounded-full\">\n        Clarity &amp; Tradition\n      </span>\n      <h2 class=\"mt-4 text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)] font-[family-name:var(--heading-font)]\">\n        Frequently Asked Questions\n      </h2>\n      <p class=\"mt-3 text-lg text-[var(--muted)] max-w-2xl mx-auto\">\n        Vedic compatibility is an intricate science. Here are honest, precise answers to the most common inquiries regarding Kundli Matching and Guna Milan.\n      </p>\n    </div>\n\n    <!-- Accordion Container -->\n    <div class=\"space-y-4\">\n      \n      <!-- FAQ Item 1 -->\n      <details class=\"group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300\" open>\n        <summary class=\"flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none\">\n          <span class=\"font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200\">\n            Is this service completely free?\n          </span>\n          <span class=\"ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180\">\n            <svg class=\"w-5 h-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19 9l-7 7-7-7\" />\n            </svg>\n          </span>\n        </summary>\n        <div class=\"px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4\">\n          <p>\n            Yes. Our online Kundli Matching and Guna Milan tool is fully accessible without any hidden charges, subscriptions, or premium paywalls. We believe that foundational Vedic calculations should be freely available to anyone seeking clarity and alignment in their personal life choices.\n          </p>\n        </div>\n      </details>\n\n      <!-- FAQ Item 2 -->\n      <details class=\"group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300\">\n        <summary class=\"flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none\">\n          <span class=\"font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200\">\n            What if I do not know my exact birth time?\n          </span>\n          <span class=\"ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180\">\n            <svg class=\"w-5 h-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19 9l-7 7-7-7\" />\n            </svg>\n          </span>\n        </summary>\n        <div class=\"px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4\">\n          <p>\n            An exact birth time ensures the most precise calculations for the Ascendant (Lagna) and the subtle divisional charts. If you do not know the exact minute, you can input a close estimate. However, even small discrepancies can shift the Moon's nakshatra quarters or modify the Navamsha chart. If high accuracy is desired, we recommend consulting a professional astrologer for a birth time rectification process.\n          </p>\n        </div>\n      </details>\n\n      <!-- FAQ Item 3 -->\n      <details class=\"group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300\">\n        <summary class=\"flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none\">\n          <span class=\"font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200\">\n            Is guna milan sufficient on its own for marriage?\n          </span>\n          <span class=\"ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180\">\n            <svg class=\"w-5 h-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19 9l-7 7-7-7\" />\n            </svg>\n          </span>\n        </summary>\n        <div class=\"px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4\">\n          <p>\n            No. While Guna Milan (Ashta Koota) is a highly structured and reliable initial screening system based on the Moon's positions, it represents only one dimension of compatibility. A complete Vedic matching process also evaluates the strength of the Seventh House (marriage), the current planetary periods (Dashas), individual longevity, and the presence of severe planetary afflictions like Manglik Dosha.\n          </p>\n        </div>\n      </details>\n\n      <!-- FAQ Item 4 -->\n      <details class=\"group bg-[var(--surface)] border border-[var(--line)] rounded-[var(--radius)] overflow-hidden transition-all duration-300\">\n        <summary class=\"flex justify-between items-center p-6 cursor-pointer list-none focus:outline-none select-none\">\n          <span class=\"font-semibold text-lg text-[var(--ink)] group-open:text-[var(--accent)] transition-colors duration-200\">\n            What is Nadi dosha and why does it matter?\n          </span>\n          <span class=\"ml-4 flex-shrink-0 text-[var(--muted)] group-open:text-[var(--accent)] transition-transform duration-300 group-open:rotate-180\">\n            <svg class=\"w-5 h-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19 9l-7 7-7-7\" />\n            </svg>\n          </span>\n        </summary>\n        <div class=\"px-6 pb-6 text-[var(--muted)] leading-relaxed border-t border-[var(--line)] pt-4\">\n          <p>\n            Nadi represents the physiological and psychological constitution (classified into Adi, Madhya, and Antya, similar to the Ayurvedic humors of Vata, Pitta, and Kapha). A Nadi Dosha occurs when both partners share the same Nadi classification. In Vedic astrology, this is assigned the highest weight of 8 points because it traditionally indicates potential challenges in progeny, genetic compatibility, and long-term health harmony.\n          </p>\n        </div>\n      </details>\n\n    </div>\n  </div>\n</section>",
+      "ms": 14509,
+      "cost": {
+        "in": 577,
+        "out": 3224,
+        "usd": 0.0298815
+      },
+      "agent": {
+        "name": "Margaret",
+        "color": "#d4a017"
+      }
+    },
+    {
+      "t": 23844,
+      "type": "done",
+      "stats": {
+        "wallMs": 23843,
+        "planMs": 9319,
+        "buildWallMs": 14524,
+        "sumMs": 70256,
+        "speedup": 4.84,
+        "sections": 6,
+        "failed": 0,
+        "tokens": {
+          "in": 4290,
+          "out": 19255
+        },
+        "costUsd": 0.1797,
+        "outDir": "/Users/pp/Documents/GitHub/swarm-build/out/myastroluck-kundli-matching-2026-11-14165820",
+        "model": "gemini-3.5-flash"
+      }
+    }
+  ]
+}

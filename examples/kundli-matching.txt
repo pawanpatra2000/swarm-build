@@ -1,0 +1,11 @@
+Landing page for MyAstroLuck Kundli Matching, a free Vedic horoscope matching tool for couples and families in India.
+
+What the page must cover:
+- Header: MyAstroLuck wordmark, nav links (Kundli, Matching, Panchang, Horoscope), a "Match now" button.
+- Hero: headline about checking compatibility the Vedic way, one-line explanation of Ashtakoota (36 gunas), and a matching form preview with two columns (boy and girl: name, date of birth, time of birth, place of birth) and a "Check compatibility" button. Note that results are calculated with the sidereal zodiac and Lahiri ayanamsha.
+- The 8 kootas explained: Varna (1), Vashya (2), Tara (3), Yoni (4), Graha Maitri (5), Gana (6), Bhakoot (7), Nadi (8), each with its points and one plain sentence on what it checks. Show the total of 36.
+- How to read the score: bands 0-17 (not recommended without remedies), 18-24 (average, acceptable), 25-32 (very good), 33-36 (excellent), plus a short note that Manglik dosha and Nadi dosha are checked separately.
+- FAQ: 4 questions (is it free, what if I do not know birth time, is guna milan enough on its own, what is Nadi dosha) with short honest answers.
+- Footer: links, a line that MyAstroLuck gives guidance and not guarantees, copyright 2026.
+
+Brand (use exactly): page background #faf7ef, surface #f4ecda, cards #ffffff, ink #1f1d1a, muted text #5a5045, rules #e3dacb, accent (terracotta) #a84219, accent text on accent #f8f1e3, pale accent tint #f3dcc9, dark band #28234c with text #f8f1e3. Radius 14px. Body font "Inter", heading font "Fraunces". Tone: warm, calm, precise, no hype. No testimonials, no ratings, no user counts.
