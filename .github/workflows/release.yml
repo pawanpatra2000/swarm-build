@@ -3,13 +3,17 @@ name: Release
 # Publishes to npm when a version tag is pushed:
 #   npm version patch   (or minor / major)
 #   git push --follow-tags
+#
+# Uses npm trusted publishing (OIDC): no npm token is stored anywhere. Configure once on npmjs.com:
+#   package swarm-build -> Settings -> Trusted publishing -> GitHub Actions,
+#   owner pawanpatra2000, repository swarm-build, workflow release.yml.
 on:
   push:
     tags: ['v*']
 
 permissions:
   contents: write   # create the GitHub release
-  id-token: write   # npm provenance
+  id-token: write   # OIDC token for npm trusted publishing (also signs provenance)
 
 jobs:
   publish:
@@ -20,6 +24,8 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+      - name: npm with trusted publishing support
+        run: npm install -g npm@latest
       - name: Tag matches package.json
         run: |
           v="$(node -p 'require("./package.json").version')"
@@ -29,10 +35,11 @@ jobs:
       - name: Smoke tests
         run: npm test
       - name: Publish to npm
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          v="$(node -p 'require("./package.json").version')"
+          if npm view "swarm-build@$v" version >/dev/null 2>&1; then echo "swarm-build@$v is already on npm, skipping publish"; exit 0; fi
+          npm publish --access public
       - name: GitHub release
-        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}

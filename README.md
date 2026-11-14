@@ -166,7 +166,7 @@ Sub-agents are slower per section than direct model calls, because each one is a
 
 - `npm test` runs offline smoke tests: agent flow, sanitising, every framework export, MCP and init.
 - CI runs them on Node 20, 22 and 24 for every push and pull request.
-- To release: run `npm version patch && git push --follow-tags`. The `Release` workflow checks that the tag matches `package.json`, runs the tests, publishes to npm with provenance, and creates a GitHub release. It needs the `NPM_TOKEN` repo secret.
+- To release: run `npm version patch && git push --follow-tags`. The `Release` workflow checks that the tag matches `package.json`, runs the tests, publishes to npm through trusted publishing (OIDC, so no npm token is stored and provenance is automatic), and creates a GitHub release.
 
 ## Licence
 
