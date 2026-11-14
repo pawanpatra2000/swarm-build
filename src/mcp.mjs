@@ -34,6 +34,11 @@ const TOOLS = [
     description: 'Run design checks on the assembled page (built-in rules, optionally the Impeccable detector). Returns findings to decide which sections to fix.',
     inputSchema: { type: 'object', properties: { impeccable: { type: 'boolean' } } },
   },
+  {
+    name: 'swarm_export',
+    description: 'Put the finished page into the project as framework components. target "auto" detects Next, React, Vue, Nuxt, Svelte, SvelteKit, Astro or plain HTML from package.json. Never overwrites files unless force is true.',
+    inputSchema: { type: 'object', properties: { target: { type: 'string', enum: ['auto', 'next', 'react', 'vue', 'nuxt', 'svelte', 'sveltekit', 'astro', 'html'] }, into: { type: 'string', description: 'Project folder; default is the current folder.' }, route: { type: 'string' }, force: { type: 'boolean' } } },
+  },
   { name: 'swarm_comments', description: 'List open comments the user left in the preview, grouped by section.', inputSchema: { type: 'object', properties: {} } },
   { name: 'swarm_status', description: 'Show the run: page path, sections, which are missing, open comments.', inputSchema: { type: 'object', properties: {} } },
   { name: 'swarm_done', description: 'Mark the build finished. Shows the result card in the preview and returns timing.', inputSchema: { type: 'object', properties: {} } },
@@ -67,6 +72,11 @@ async function call(name, a = {}) {
       if (!open.length) return 'No open comments.';
       return JSON.stringify(open, null, 2) + '\n\nFor each section listed, call swarm_task {id, comments: true} (in parallel sub-agents), then swarm_submit.';
     }
+    case 'swarm_export': {
+      const { exportFramework } = await import('./frameworks.mjs');
+      const r = await exportFramework(await current(), { target: a.target || 'auto', into: a.into || process.cwd(), route: a.route, force: a.force });
+      return `${r.target} export into ${r.dir}\n${r.files.map((f) => `- ${f}`).join('\n')}${r.route ? `\nroute: ${r.route}` : ''}${r.notes.length ? `\n${r.notes.map((n) => `note: ${n}`).join('\n')}` : ''}\nRun the project's build or type-check once and fix anything it reports.`;
+    }
     case 'swarm_status': return JSON.stringify(await agentStatus(await current()), null, 2);
     case 'swarm_done': {
       const st = await agentDone(await current());
@@ -89,7 +99,7 @@ export function serve() {
     try {
       if (method === 'initialize') {
         const v = PROTOCOLS.includes(params?.protocolVersion) ? params.protocolVersion : PROTOCOLS[0];
-        return reply({ protocolVersion: v, capabilities: { tools: {} }, serverInfo: { name: 'swarm-build', version: VERSION }, instructions: 'Build web pages in parallel: swarm_start -> swarm_plan -> parallel swarm_task/swarm_submit per section -> swarm_check -> swarm_done. Show the preview URL to the user.' });
+        return reply({ protocolVersion: v, capabilities: { tools: {} }, serverInfo: { name: 'swarm-build', version: VERSION }, instructions: 'Build web pages in parallel: swarm_start -> swarm_plan -> parallel swarm_task/swarm_submit per section -> swarm_check -> swarm_done -> swarm_export. Show the preview URL to the user.' });
       }
       if (method === 'ping') return reply({});
       if (method === 'tools/list') return reply({ tools: TOOLS });

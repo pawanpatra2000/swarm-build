@@ -1,18 +1,44 @@
 {
   "name": "swarm-build",
-  "version": "0.2.0",
-  "description": "Plan a UI into sections, build every section in parallel with AI agents, and watch swarm cursors assemble the real page live. Works standalone or inside Claude Code, Codex, Cursor and Kiro.",
+  "version": "0.3.0",
+  "description": "Any coding agent (Claude Code, Codex, Cursor, Kiro, ...) plans a UI into sections, builds them in parallel with its own sub-agents, and you watch swarm cursors assemble the real page live. Exports to Next.js, React, Vue, Nuxt, Svelte, SvelteKit and Astro. No API key needed.",
+  "keywords": [
+    "agents",
+    "agents-md",
+    "ai",
+    "astro",
+    "claude-code",
+    "codex",
+    "cursor",
+    "design",
+    "kiro",
+    "landing-page",
+    "mcp",
+    "nextjs",
+    "nuxt",
+    "parallel",
+    "react",
+    "skill",
+    "sub-agents",
+    "svelte",
+    "sveltekit",
+    "tailwind",
+    "ui",
+    "vue"
+  ],
+  "homepage": "https://github.com/pawanpatra2000/swarm-build#readme",
+  "bugs": {
+    "url": "https://github.com/pawanpatra2000/swarm-build/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pawanpatra2000/swarm-build.git"
+  },
+  "license": "MIT",
+  "author": "Pawan Patra",
   "type": "module",
   "bin": {
     "swarm-build": "bin/swarm-build.mjs"
-  },
-  "scripts": {
-    "start": "node bin/swarm-build.mjs",
-    "test": "node --test test/",
-    "record": "node tools/record.mjs"
-  },
-  "engines": {
-    "node": ">=20"
   },
   "files": [
     "bin/",
@@ -22,26 +48,18 @@
     "README.md",
     "LICENSE"
   ],
-  "keywords": [
-    "ai",
-    "agents",
-    "ui",
-    "landing-page",
-    "parallel",
-    "claude-code",
-    "codex",
-    "cursor",
-    "kiro",
-    "mcp",
-    "tailwind",
-    "design"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pawanpatra2000/swarm-build.git"
+  "scripts": {
+    "start": "node bin/swarm-build.mjs",
+    "test": "node --test",
+    "record": "node tools/record.mjs"
   },
-  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "devDependencies": {
     "playwright": "^1.64.1"
   }

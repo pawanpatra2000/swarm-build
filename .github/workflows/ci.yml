@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Syntax check
+        run: for f in bin/*.mjs src/*.mjs preview/swarm.js; do node --check "$f"; done
+      - name: Smoke tests (offline, no model calls)
+        run: npm test
+      - name: Package contents
+        run: npm pack --dry-run

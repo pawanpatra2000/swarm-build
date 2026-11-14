@@ -1,0 +1,38 @@
+name: Release
+
+# Publishes to npm when a version tag is pushed:
+#   npm version patch   (or minor / major)
+#   git push --follow-tags
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write   # create the GitHub release
+  id-token: write   # npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Tag matches package.json
+        run: |
+          v="$(node -p 'require("./package.json").version')"
+          if [ "v$v" != "$GITHUB_REF_NAME" ]; then echo "Tag $GITHUB_REF_NAME does not match package.json version $v"; exit 1; fi
+      - name: Syntax check
+        run: for f in bin/*.mjs src/*.mjs preview/swarm.js; do node --check "$f"; done
+      - name: Smoke tests
+        run: npm test
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: GitHub release
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

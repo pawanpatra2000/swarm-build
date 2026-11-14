@@ -3,7 +3,7 @@
 # Usage: sh tools/live.sh <brief-file> [extra `swarm-build run` args]
 # Logs: out/live-server.log. Stop: kill "$(cat out/live-server.pid)"
 cd "$(dirname "$0")/.." || exit 1
-NODE="${NODE:-$(command -v node || echo /Users/pawan/.nvm/versions/node/v24.21.0/bin/node)}"
+NODE="${NODE:-node}"
 [ -f out/live-server.pid ] && kill "$(cat out/live-server.pid)" 2>/dev/null
 mkdir -p out
 BRIEF="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"; shift

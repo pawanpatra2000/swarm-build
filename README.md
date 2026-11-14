@@ -4,8 +4,18 @@ Describe a page. A planner sets the design direction and splits the page into se
 
 It works two ways:
 
-- **Inside your coding agent** (Claude Code, Codex, Cursor, Kiro, or anything with a shell or MCP). Your agent does the thinking and its sub-agents build the sections. No extra API key.
+- **Inside any coding agent** (Claude Code, Codex, Cursor, Kiro, T3 Code, or anything with a shell or MCP). Your agent does the thinking with its own model and its sub-agents build the sections. **No API key.**
 - **Standalone.** swarm-build calls a model itself (Claude, OpenAI, Gemini or Vertex AI).
+
+The finished page goes straight into your project's framework: Next.js, React, Vue, Nuxt, Svelte, SvelteKit, Astro or plain HTML.
+
+## Zero install: tell any agent
+
+Paste this into any coding agent that can run shell commands:
+
+> Run `npx -y swarm-build guide` and follow it to swarm build a landing page for a yoga studio in Goa.
+
+The guide is the full workflow. The agent starts the live preview, plans, starts sub-agents in parallel, reviews the result and exports the page into your framework.
 
 ## Quickstart: inside your coding agent
 
@@ -31,6 +41,7 @@ What `init` writes:
 | Codex | `.agents/skills/swarm-build/SKILL.md`; with `--mcp` it prints the `codex mcp add` command |
 | Cursor | `.cursor/rules/swarm-build.mdc`, `.cursor/mcp.json` with `--mcp` |
 | Kiro | `.kiro/skills/swarm-build/SKILL.md`, `.kiro/settings/mcp.json` with `--mcp` |
+| Any agent that reads AGENTS.md | a short `swarm-build` block in `AGENTS.md` (`--agent agents-md`) |
 
 Add `--agent claude,codex` to choose agents and `--global` to install for your user instead of the project. `.swarm/` is added to `.gitignore`.
 
@@ -76,7 +87,38 @@ swarm-build check --impeccable
 swarm-build comments | status | done
 ```
 
-MCP tools (`swarm-build mcp`): `swarm_start`, `swarm_plan`, `swarm_task`, `swarm_submit`, `swarm_check`, `swarm_comments`, `swarm_status`, `swarm_done`.
+MCP tools (`swarm-build mcp`): `swarm_start`, `swarm_plan`, `swarm_task`, `swarm_submit`, `swarm_check`, `swarm_comments`, `swarm_status`, `swarm_done`, `swarm_export`.
+
+## Framework output
+
+The agents build sections as HTML + Tailwind, because that's what the live preview animates. At the end the page is converted into your framework:
+
+```bash
+swarm-build export auto --into .              # detect from package.json
+swarm-build export next --into . --route yoga # or pick one
+```
+
+| Target | Page | Sections |
+|---|---|---|
+| Next.js (App Router) | `app/<route>/page.tsx` | `components/swarm/<slug>/*.tsx` |
+| React (Vite etc.) | `src/swarm/<slug>/Page.tsx` | `src/swarm/<slug>/components/*.tsx` |
+| Vue | `components/swarm/<slug>/Page.vue` | `*.vue` |
+| Nuxt | `pages/<route>.vue` | `components/swarm/<slug>/*.vue` |
+| Svelte / SvelteKit | `src/routes/<route>/+page.svelte` (Kit) | `src/lib/swarm/<slug>/*.svelte` |
+| Astro | `src/pages/<route>.astro` | `src/components/swarm/<slug>/*.astro` |
+| HTML | `public/<slug>.html` | |
+
+How it handles the details:
+- Uses TypeScript if the project does, and the `@/` alias if it's configured.
+- Never overwrites a file without `--force`.
+- The theme CSS is scoped to `.swarm-page`, so it doesn't restyle the rest of your app.
+- Needs Tailwind v4, or v3.3 and later. On v3, add the generated folder to `content`.
+
+Tested:
+- A real Next.js 16 + Tailwind 4 app: `next build` passes and the route renders with the right fonts and theme.
+- Vue, Svelte and Astro exports: every file compiles with the official compilers.
+
+Forms and buttons come without handlers; wire them to your app.
 
 ## Output and exports
 
@@ -88,9 +130,8 @@ Each run is a folder `.swarm/<run>/`:
 - `events.jsonl`: the timeline.
 - `comments.json`: comments from the preview.
 
-Exports:
+Other exports:
 
-- `swarm-build export react`: `Page.jsx`, one component per section and `theme.css`. Needs Tailwind with that folder in its content paths.
 - `swarm-build export share`: one HTML file that replays the build in any browser, no server.
 - `swarm-build replay [run-dir] --open`: replays a saved run with its original timing.
 
@@ -116,10 +157,16 @@ Sub-agents are slower per section than direct model calls, because each one is a
 
 ## Limits
 
-- Output is static HTML on the Tailwind Play CDN. For production, compile Tailwind or use the React export.
+- `index.html` uses the Tailwind Play CDN, so it's fine for previews. For production, use a framework export, which goes through your own Tailwind build.
 - Agents don't see each other's code. Consistency comes from the shared plan, tokens and classes, so check the joins between sections.
 - Sections are sanitised: no scripts, iframes, handlers, `javascript:` URLs or external images, and viewport-height units become pixels. Still review the code before you ship it.
 - The preview binds to `127.0.0.1` only.
+
+## Development and releases
+
+- `npm test` runs offline smoke tests: agent flow, sanitising, every framework export, MCP and init.
+- CI runs them on Node 20, 22 and 24 for every push and pull request.
+- To release: run `npm version patch && git push --follow-tags`. The `Release` workflow checks that the tag matches `package.json`, runs the tests, publishes to npm with provenance, and creates a GitHub release. It needs the `NPM_TOKEN` repo secret.
 
 ## Licence
 

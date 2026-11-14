@@ -5,7 +5,12 @@ description: Build a web page or UI fast by planning it into sections and buildi
 
 # swarm-build
 
-swarm-build gives you a live preview and a run folder. You (the coding agent) do the design thinking. Your sub-agents write the sections, and the preview animates each one as it lands. Run every command from the project root.
+swarm-build gives you a live preview and a run folder.
+- **You** (the coding agent) do the design thinking with your own model. No API key is needed.
+- **Your sub-agents** write the sections.
+- **The preview** animates each section as it lands.
+
+Run every command from the project root.
 
 `SB` below means: `{{SB}}`
 
@@ -57,16 +62,30 @@ The user can click any element in the preview and leave a comment.
 - For each section that has comments, start a sub-agent (all in one message) with this instruction: "Run `SB task <id> --comments`, follow it, then `SB submit <id> <file>`."
 - Submitting resolves that section's open comments.
 
-## 6. Hand off
+## 6. Put the page into the project
+
+```bash
+SB export auto --into .        # detects Next, React, Vue, Nuxt, Svelte, SvelteKit, Astro or plain HTML
+```
+
+- It writes the page and one component per section in the project's own conventions.
+  - Next.js: `app/<route>/page.tsx` plus `components/swarm/<slug>/*.tsx`.
+  - Nuxt: `pages/<route>.vue`.
+  - SvelteKit: `src/routes/<route>/+page.svelte`.
+  - Astro: `src/pages/<route>.astro`.
+- Existing files are never overwritten. Use `--route <path>` to pick another path, or `--force` only if the user agrees.
+- The markup needs Tailwind CSS v4, or v3.3 and later. If the command says Tailwind is missing, tell the user.
+- Run the project's own build or type-check once and fix anything it reports in the generated files.
+- If there's no project, skip this step. `.swarm/<run>/index.html` is a complete page.
+
+## 7. Hand off
 
 Tell the user:
-- The page path: `.swarm/<run>/index.html`.
+- Where the page lives: its route, or `.swarm/<run>/index.html`.
 - The preview URL.
 - The speed-up from `SB done`.
 
-Offer these exports:
-- `SB export react` for React components.
-- `SB export share` for a single-file replay they can send to someone.
+Offer `SB export share` for a single-file replay they can send to someone.
 
 ## Rules
 

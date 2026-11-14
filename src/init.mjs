@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 import { sbCmd } from './cli.mjs';
 
 const PKG = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const AGENTS = ['claude', 'codex', 'cursor', 'kiro'];
+const AGENTS = ['claude', 'codex', 'cursor', 'kiro', 'agents-md'];
+const MARK_START = '<!-- swarm-build:start -->';
+const MARK_END = '<!-- swarm-build:end -->';
 
 function detect(cwd) {
   const has = (p) => existsSync(path.join(cwd, p));
@@ -17,7 +19,7 @@ function detect(cwd) {
   if (has('.codex') || has('.agents') || has('AGENTS.md')) found.push('codex');
   if (has('.cursor') || has('.cursorrules')) found.push('cursor');
   if (has('.kiro')) found.push('kiro');
-  return found.length ? found : ['claude', 'codex'];
+  return found.length ? found : ['claude', 'codex', 'agents-md'];
 }
 
 async function writeFileSafe(file, text, written) {
@@ -86,6 +88,16 @@ export async function init(o) {
         await writeFileSafe(path.join(cwd, '.cursor', 'rules', 'swarm-build.mdc'), `---\ndescription: Build a page fast with parallel agents and a live swarm-cursor preview (swarm-build).\nalwaysApply: false\n---\n${body}`, written);
         if (o.mcp) await mergeMcp(path.join(cwd, '.cursor', 'mcp.json'), mcpEntry(), written);
       }
+    }
+    if (a === 'agents-md') {
+      // AGENTS.md is read by many coding agents; a short pointer keeps it small and always current.
+      if (global) { notes.push('agents-md is per project; run init inside the project.'); continue; }
+      const file = path.join(cwd, 'AGENTS.md');
+      const block = `${MARK_START}\n## swarm-build\n\nWhen the user asks to "swarm build" a page or to build a UI fast with parallel agents, run \`${sb} guide\` and follow it exactly. It uses your own model and sub-agents (no API key) and shows a live preview of the build.\n${MARK_END}\n`;
+      let text = existsSync(file) ? await readFile(file, 'utf8') : '';
+      const re = new RegExp(`${MARK_START}[\\s\\S]*?${MARK_END}\\n?`);
+      text = re.test(text) ? text.replace(re, block) : `${text}${text && !text.endsWith('\n') ? '\n' : ''}${text ? '\n' : ''}${block}`;
+      await writeFileSafe(file, text, written);
     }
     if (a === 'kiro') {
       await writeFileSafe(path.join(base, '.kiro', 'skills', 'swarm-build', 'SKILL.md'), skill, written);

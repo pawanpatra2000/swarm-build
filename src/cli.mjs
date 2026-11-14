@@ -29,7 +29,8 @@ Standalone (this tool calls the model; needs ANTHROPIC_API_KEY, OPENAI_API_KEY, 
   swarm-build run "<brief>" [--brief-file f] [--sections 6] [--theme theme.json] [--design-file DESIGN.md]
                   [--no-review] [--impeccable] [--open] [--now] [--headless] [--port 4777]
 
-Agent mode (a coding agent plans and builds; no API key here):
+Agent mode (any coding agent plans and builds with its own model; no API key):
+  swarm-build guide                 print the full workflow for the agent to follow (no install needed)
   swarm-build start "<brief>" | --brief-file f [--agent "Claude Code"] [--no-preview] [--open]
   swarm-build guide plan            print planning instructions and the plan JSON shape
   swarm-build plan <plan.json|->    save the plan, print one task per section
@@ -42,15 +43,16 @@ Agent mode (a coding agent plans and builds; no API key here):
 Preview, replay, export, setup:
   swarm-build preview [--run dir] [--port 4777] [--open]
   swarm-build replay [run-dir] [--open]
-  swarm-build export react [--out dir] | share [--out file.html]
-  swarm-build init [--agent claude|codex|cursor|kiro|all] [--mcp] [--design] [--global]
+  swarm-build export [auto|next|react|vue|nuxt|svelte|sveltekit|astro|html] [--into .] [--route path] [--force]
+  swarm-build export share [--out file.html]
+  swarm-build init [--agent claude|codex|cursor|kiro|agents-md|all] [--mcp] [--design] [--global]
   swarm-build mcp                   MCP server over stdio (tools: swarm_start, swarm_plan, swarm_task, ...)
 
 Common: --run <dir> picks a run (default: .swarm/current). --root <dir> changes the .swarm folder.`;
 
 export function parseArgs(argv) {
   const o = { _: [] };
-  const flags = new Set(['open', 'now', 'headless', 'no-review', 'impeccable', 'no-preview', 'comments', 'design', 'global', 'json', 'help', 'version', 'yes', 'all', 'mcp']);
+  const flags = new Set(['open', 'now', 'headless', 'no-review', 'impeccable', 'no-preview', 'comments', 'design', 'global', 'json', 'help', 'version', 'yes', 'all', 'mcp', 'force']);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '-h') o.help = true;
@@ -116,10 +118,19 @@ export async function ensurePreview(root, { port = 4777 } = {}) {
 export async function agentStart({ brief, root = '.swarm', agent, preview = true, port }) {
   if (!brief || !brief.trim()) throw new Error('A brief is required.');
   const run = await Run.create(brief.trim(), { root, mode: 'agent' });
+  const { detectTarget } = await import('./frameworks.mjs');
+  run.meta.target = (await detectTarget()).target;
+  await writeFile(run.file('run.json'), JSON.stringify(run.meta, null, 2));
   await run.emit({ type: 'meta', brief: brief.trim(), model: agent || null, mode: 'agent' });
   await run.emit({ type: 'plan:start' });
   const url = preview ? await ensurePreview(root, { port: port ? Number(port) : 4777 }) : null;
   return { run, url };
+}
+
+// The whole agent workflow, printable by any agent with a shell: `npx -y swarm-build guide`.
+export async function workflowGuide() {
+  const text = await readFile(path.join(PKG, 'skill', 'SKILL.md'), 'utf8');
+  return text.replace(/^---[\s\S]*?---\n/, '').replaceAll('{{SB}}', sbCmd());
 }
 
 export function planGuide(run) {
@@ -254,16 +265,18 @@ export async function main(argv) {
       if (url && o.open) openURL(url);
       console.log(`run:     ${run.dir}`);
       if (url) console.log(`preview: ${url}   <- show this to the user`);
+      console.log(`target:  ${run.meta.target} (detected; the page is exported into this framework at the end)`);
       console.log(`\nNext: run \`${sbCmd()} guide plan\`, write .swarm/plan.json, then \`${sbCmd()} plan .swarm/plan.json\`.`);
       return;
     }
     case 'guide': {
-      const kind = o._[1] || 'plan';
+      const kind = o._[1] || 'workflow';
       let run = null;
       try { run = await current(); } catch { /* guide works without a run */ }
+      if (kind === 'workflow') return console.log(await workflowGuide());
       if (kind === 'plan') return console.log(planGuide(run));
       if (kind === 'build') return console.log(BUILDER_SYSTEM);
-      throw new Error('Use: swarm-build guide plan|build');
+      throw new Error('Use: swarm-build guide [workflow|plan|build]');
     }
     case 'plan': {
       const run = await current();
@@ -320,12 +333,22 @@ export async function main(argv) {
       return new Promise(() => {});
     }
     case 'export': {
-      const { exportReact, exportShare } = await import('./export.mjs');
       const run = await current();
-      const kind = o._[1];
-      if (kind === 'react') { const r = await exportReact(run, o.out); return console.log(`React export: ${r.dir} (${r.components} components)`); }
-      if (kind === 'share') { const r = await exportShare(run, o.out); return console.log(`Share file: ${r.file} (${(r.bytes / 1024).toFixed(0)} KB). Open it in any browser; it replays the build.`); }
-      throw new Error('Use: swarm-build export react|share');
+      const kind = o._[1] || 'auto';
+      if (kind === 'share') {
+        const { exportShare } = await import('./export.mjs');
+        const r = await exportShare(run, o.out);
+        return console.log(`Share file: ${r.file} (${(r.bytes / 1024).toFixed(0)} KB). Open it in any browser; it replays the build.`);
+      }
+      const { exportFramework, TARGETS } = await import('./frameworks.mjs');
+      if (kind !== 'auto' && !TARGETS.includes(kind)) throw new Error(`Use: swarm-build export auto|${TARGETS.join('|')}|share [--into <project>] [--route path] [--force]`);
+      const into = o.into;
+      const r = await exportFramework(run, { target: kind, into, route: o.route, force: o.force });
+      console.log(`${r.target} export${into ? ` into ${r.dir}` : `: ${r.dir}`}`);
+      r.files.forEach((f) => console.log(`  ${path.relative(process.cwd(), f) || f}`));
+      if (r.route && into) console.log(`route: ${r.route}`);
+      r.notes.forEach((n) => console.log(`note: ${n}`));
+      return;
     }
     case 'init': return (await import('./init.mjs')).init(o);
     case 'mcp': return (await import('./mcp.mjs')).serve();
